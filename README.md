@@ -8,6 +8,10 @@ TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Security](https://img.shields.io/badge/Security-Client%20Side%20Only-green.svg)
 
+
+https://github.com/user-attachments/assets/36fe62e4-7047-4f83-8eb0-c3ec89e52ed2
+
+
 ## ✨ Features
 
 * **⚡ Smart Extraction:** Automatically detects and sorts IPv4/IPv6, Domains, URLs, and MD5/SHA Hashes from raw text.
@@ -23,7 +27,7 @@ TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. 
 | :--- | :--- | :--- |
 | **IPv4 / IPv6** | ✅ | `1.1.1.1`, `2606:4700...` |
 | **Domains** | ✅ | `google.com` |
-| **URLs** | ✅ | `https://malicious-site.com/path` |
+| **URLs** | ✅ | `hxxps://malicious-site.com/path` |
 | **Hashes** | ✅ | MD5, SHA-1, SHA-256 |
 
 ## 🚀 Usage
@@ -54,7 +58,7 @@ const sources = {
             id: 'TOOL_ID', 
             name: 'Tool Name', 
             url: 'hxxps://example.com', 
-            lookupurl: 'hxxps://[example.com/search/](https://example.com/search/)' // Optional
+            lookupurl: 'hxxps://example.com/search/' // Optional
         }
     ],
     domain: [ ... ],
@@ -72,7 +76,7 @@ const sources = {
 
 ## 🏷️ Tags
 
-`osint` `threat-intelligence` `cybersecurity` `soc` `blue-team` `incident-response` `investigation` `ioc-extraction` `dfir` `opsec` `malware-analysis` `security-tools` `productivity` `javascript` `infosec` `digital-forensics` `threat-hunting` `ioc-parser` `ip-lookup` `hash-lookup` `reconnaissance` `privacy-focused` `client-side` `zero-persistence` `secops`
+`osint` `threat-intelligence` `cybersecurity` `soc` `blue-team` `incident-response` `investigation` `ioc-extraction` `opsec` `malware-analysis` `security-tools` `infosec` `digital-forensics` `threat-hunting` `ioc-parser` `ioc-lookup` `reconnaissance` `client-side` `zero-persistence` `secops`
 
 ---
 
