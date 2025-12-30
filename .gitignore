@@ -1,0 +1,11 @@
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Editor Folders
+.vscode/
+.idea/
+
+# Local backup files
+*.swp
+*~

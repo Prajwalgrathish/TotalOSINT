@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jhatzimalis.github.io/TotalOSINT/sitemap.xml

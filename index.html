@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TotalOSINT</title>
+    <meta name="description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. Instantly extract IOCs (IPs, Domains, Hashes) from raw logs and launch bulk investigations across dozens of threat intelligence sources. Zero-data-persistence workflow for SOC and DFIR teams. No installation required.">
+    <meta name="keywords" content="osint, threat-intelligence, cybersecurity, soc, blue-team, incident-response, investigation, ioc-extraction, dfir, opsec, malware-analysis, security-tools, productivity, javascript, infosec, digital-forensics, threat-hunting, ioc-parser, ip-lookup, hash-lookup, reconnaissance, privacy-focused, client-side, zero-persistence, secops">
+    <link rel="canonical" href="https://jhatzimalis.github.io/TotalOSINT/" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️‍♂️</text></svg>">
+    
+    <style>
+        /* --- Variables --- */
+        :root {
+            /* Theme: Dark (Default) */
+            --bg-body: #0f172a; --bg-panel: #1e293b; --bg-header: #020617;
+            --text-main: #f1f5f9; --text-muted: #94a3b8; --text-light: #ecf0f1;
+            --accent: #3b82f6; --accent-hover: #60a5fa; 
+            --border: #334155; --shadow: 0 4px 6px -1px rgba(0,0,0,0.3);
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+            --radius: 6px;
+            --hl-dim: rgba(255, 255, 255, 0.08); 
+            --hl-active: rgba(59, 130, 246, 0.5); 
+            --toast-y: 85px; 
+        }
+
+        body.theme-light {
+            --bg-body: #f4f6f8; --bg-panel: #ffffff; --bg-header: #202b36;
+            --text-main: #2c3e50; --text-muted: #64748b;
+            --accent: #2563eb; --accent-hover: #1d4ed8; 
+            --border: #dce1e6; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --hl-dim: rgba(0, 0, 0, 0.05); 
+            --hl-active: rgba(255, 235, 59, 0.5);
+        }
+
+        /* --- Reset & Layout --- */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-main); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; transition: background 0.2s, color 0.2s; }
+        
+        /* --- Navbar --- */
+        header { background: var(--bg-header); color: var(--text-light); padding: 0 20px; height: 55px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10; }
+        .branding { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+        .branding:hover { opacity: 0.9; }
+        .logo-text { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
+        .nav-links { display: flex; gap: 12px; align-items: center; }
+        .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; display: flex; align-items: center; gap: 5px; }
+        .nav-link:hover { color: var(--text-light); }
+        .icon-btn { background: none; border: 1px solid transparent; color: inherit; font-size: 1.1rem; cursor: pointer; padding: 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:hover { background: rgba(255,255,255,0.1); }
+
+        /* --- Buttons --- */
+        .btn-fancy {
+            display: flex; align-items: stretch; padding: 0; border: 1px solid var(--border); border-radius: var(--radius);
+            background: var(--bg-panel); color: var(--text-main); cursor: pointer; transition: all 0.2s; overflow: hidden; height: 38px; min-height: 38px;
+            user-select: none; flex: 1; box-sizing: border-box;
+        }
+        .btn-fancy:hover { border-color: var(--accent); transform: translateY(-1px); }
+        .btn-fancy-icon { width: 36px; background: rgba(125,125,125,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; border-right: 1px solid var(--border); flex-shrink: 0; }
+        .btn-fancy-text { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem; padding: 0 10px; white-space: nowrap; }
+        
+        .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-primary .btn-fancy-icon { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-sm { height: 30px; min-height: 30px; font-size: 0.8rem; }
+        .btn-sm .btn-fancy-icon { width: 30px; }
+
+        /* --- Main Layout --- */
+        main { flex: 1; display: flex; overflow: hidden; position: relative; }
+        
+        /* Left Panel */
+        .panel-input { width: 400px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 5; flex-shrink: 0; }
+        .panel-header { padding: 9px 15px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
+        .header-actions { display: flex; gap: 5px; }
+
+        .input-container { position: relative; flex: 1; width: 100%; overflow: hidden; }
+        .input-backdrop, .input-textarea {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0; padding: 15px; border: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; line-height: 1.5;
+            box-sizing: border-box; white-space: pre-wrap; word-wrap: break-word; overflow: auto;
+        }
+        .input-backdrop { z-index: 1; color: transparent; pointer-events: none; background: transparent; }
+        .input-textarea { z-index: 2; color: var(--text-main); background: transparent; resize: none; outline: none; }
+        
+        /* Highlight States */
+        mark { color: transparent; border-radius: 2px; background: transparent; }
+        .mode-overview mark { background: var(--hl-active); }
+        .mode-ip mark.type-ip { background: var(--hl-active); }
+        .mode-ip mark:not(.type-ip) { background: var(--hl-dim); }
+        .mode-domain mark.type-domain { background: var(--hl-active); }
+        .mode-domain mark:not(.type-domain) { background: var(--hl-dim); }
+        .mode-hash mark.type-hash { background: var(--hl-active); }
+        .mode-hash mark:not(.type-hash) { background: var(--hl-dim); }
+
+        .analyze-bar { padding: 11px; border-top: 1px solid var(--border); background: var(--bg-panel); }
+
+        /* Right Panel */
+        .panel-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-body); }
+        
+        /* Tabs */
+        .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 10px; overflow-x: auto; flex-shrink: 0; }
+        .tab { padding: 14px 18px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .tab:hover { color: var(--accent); }
+        .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .badge { background: var(--border); color: var(--text-main); font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; min-width: 16px; text-align: center; font-weight: 700; }
+        .tab.active .badge { background: var(--accent); color: white; }
+
+        /* Source Grid & Headers */
+        .sources-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .sources-header { padding: 10px 15px; background: var(--bg-body); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .sh-left { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .sh-right { display: flex; gap: 8px; }
+
+        .sources-container { flex: 1; overflow-y: auto; padding: 20px; }
+        .sources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+        
+        /* Overview Dashboard */
+        .overview-dashboard { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 15px; 
+            padding-bottom: 20px; 
+            align-items: start; /* Fixes individual expansion */
+        }
+        
+        .ov-card { 
+            background: var(--bg-panel); 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            display: flex; 
+            flex-direction: column; 
+            max-height: 75vh; 
+            overflow: hidden; 
+        }
+        
+        .ov-header { padding: 10px 15px; border-bottom: 1px solid var(--border); font-weight: 600; background: rgba(0,0,0,0.02); display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-main); cursor: pointer; transition: background 0.1s; align-items: center; }
+        .ov-header:hover { background: var(--bg-body); color: var(--accent); }
+        .ov-content { padding: 0; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; color: var(--text-muted); flex: 1; }
+        .ov-subgroup { padding: 5px 0; }
+        .ov-sub-title { padding: 5px 12px; font-size: 0.8rem; font-weight: 700; color: var(--text-main); background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); margin-top: -1px; }
+        
+        .ov-row { padding: 4px 15px; border-bottom: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
+        .ov-row:last-child { border-bottom: none; }
+        .ov-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        
+        .ov-remove-btn { opacity: 0; background: none; border: none; color: var(--danger); cursor: pointer; font-weight: 700; padding: 0 0 0 8px; transition: opacity 0.2s; font-size: 1rem; }
+        .ov-row:hover .ov-remove-btn { opacity: 1; }
+        .ov-remove-btn:hover { color: #ff6b6b; }
+
+        .source-card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; cursor: pointer; transition: all 0.1s; user-select: none; position: relative; display: flex; align-items: center; gap: 10px; }
+        .source-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: var(--shadow); }
+        .source-card.selected { background: var(--bg-panel); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+        .source-card.selected::after { content: '✓'; position: absolute; right: 8px; top: 8px; color: var(--accent); font-weight: bold; font-size: 0.8rem; }
+        .source-name { font-size: 0.9rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding-right: 15px; }
+        .lookup-indicator { font-size: 0.85rem; color: var(--accent); margin-left: auto; display: flex; align-items: center; }
+
+        /* Footer Toolbar */
+        .toolbar { padding: 10px 20px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 60px; box-sizing: border-box; }
+        .toolbar-stats { display: flex; gap: 15px; font-size: 0.85rem; color: var(--text-muted); }
+        .stat-item span { color: var(--text-main); font-weight: 600; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-panel); width: 90%; max-width: 900px; max-height: 90vh; border-radius: var(--radius); display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; border: 1px solid var(--border); }
+        .modal-header { padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
+        .modal-header h2 { margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .modal-body { padding: 0; overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
+        
+        .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; background: var(--bg-body); }
+        .modal-tab { padding: 12px 15px; cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent; color: var(--text-muted); }
+        .modal-tab.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
+        .modal-tab-content { padding: 20px; display: none; overflow-y: auto; }
+        .modal-tab-content.active { display: block; }
+
+        /* Investigation Grid */
+        .investigation-grid { display: grid; grid-template-columns: 2.2fr 1fr; height: 100%; overflow: hidden; }
+        .inv-column { display: flex; flex-direction: column; overflow: hidden; height: 100%; border-right: 1px solid var(--border); }
+        .inv-column:last-child { border-right: none; background: var(--bg-body); }
+        .inv-column-header { padding: 10px 15px; background: var(--bg-body); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        
+        .inv-list { overflow-y: auto; flex: 1; padding: 0; }
+        .inv-item { padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: var(--bg-panel); }
+        .inv-item:hover { background: var(--bg-body); }
+        .inv-item-header { display: flex; justify-content: space-between; align-items: center; }
+        .inv-val { font-family: 'Consolas', monospace; font-weight: 600; color: var(--accent); font-size: 0.95rem; }
+        
+        .inv-controls { display: flex; gap: 8px; align-items: center; }
+        .verdict-select { padding: 5px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.85rem; background: var(--bg-panel); color: var(--text-main); }
+        .note-input { flex: 1; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; background: var(--bg-body); color: var(--text-main); }
+        .note-input:focus { border-color: var(--accent); outline: none; background: var(--bg-panel); }
+
+        /* Creative Theme Selector */
+        .theme-selector { display: flex; gap: 15px; margin-top: 10px; }
+        .theme-card { flex: 1; border: 2px solid var(--border); padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.2s; opacity: 0.6; background: var(--bg-panel); }
+        .theme-card:hover { transform: translateY(-2px); opacity: 0.9; }
+        .theme-card.active { border-color: var(--accent); opacity: 1; background: rgba(59, 130, 246, 0.05); }
+        .theme-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+        .theme-name { font-weight: 600; font-size: 0.9rem; }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .text-danger { color: var(--danger); }
+        .text-muted { color: var(--text-muted); }
+        .flex-gap { display: flex; gap: 10px; align-items: center; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; }
+        .form-text { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .form-input, .form-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel); color: var(--text-main); box-sizing: border-box; }
+        .form-input:focus, .form-select:focus { border-color: var(--accent); outline: none; }
+        .form-input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg-body); }
+        
+        .custom-source-list { border: 1px solid var(--border); max-height: 250px; overflow-y: auto; margin-top: 10px; border-radius: 4px; }
+        .custom-source-item { padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
+
+        .toast { position: fixed; bottom: var(--toast-y); right: 25px; background: #333; color: white; padding: 12px 20px; border-radius: 6px; z-index: 2000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+        .toast.visible { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); color: #000; }
+
+        /* Toggle Switch */
+        .toggle-switch { position: relative; display: inline-block; width: 34px; height: 20px; vertical-align: middle; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .2s; border-radius: 20px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: var(--accent); }
+        input:checked + .toggle-slider:before { transform: translateX(14px); }
+
+        @media (max-width: 900px) {
+            main { flex-direction: column; }
+            .panel-input { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid var(--border); }
+            .investigation-grid { grid-template-columns: 1fr; }
+            .inv-column { border-right: none; border-bottom: 1px solid var(--border); }
+            .inv-column:last-child { height: auto; max-height: 250px; }
+            .toolbar { height: auto; flex-wrap: wrap; gap: 10px; padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="branding" id="branding-btn" title="Reset Application">
+        <span style="font-size: 1.8rem;">🕵️‍♂️</span>
+        <div>
+            <div class="logo-text">TotalOSINT</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">All-in-One Investigation Tool</div>
+        </div>
+    </div>
+    <div class="nav-links">
+        <a href="https://github.com/jhatzimalis/TotalOSINT" target="_blank" class="nav-link" title="GitHub Repo">
+            <svg height="20" viewBox="0 0 16 16" width="20" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path></svg>
+            GitHub
+        </a>
+        <button class="icon-btn" id="settings-btn" title="Settings">⚙️</button>
+    </div>
+</header>
+
+<main>
+    <!-- Left Panel: Input -->
+    <div class="panel-input">
+        <div class="panel-header">
+            <span>Investigation Notes / Logs</span>
+            <div class="header-actions">
+                <button class="icon-btn" id="copy-input-btn" title="Copy Text" style="font-size:0.9rem;">📋</button>
+                <button class="icon-btn" id="clear-input-btn" title="Clear & Reset" style="font-size:0.9rem;">🗑️</button>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <div class="input-backdrop mode-overview" id="input-backdrop"><div class="highlights"></div></div>
+            <textarea class="input-textarea" id="raw-input" placeholder="Paste raw text here...&#10;TotalOSINT will extract IPs, Domains, and Hashes."></textarea>
+        </div>
+
+        <div class="analyze-bar">
+            <button class="btn-fancy btn-primary" id="analyze-btn">
+                <div class="btn-fancy-icon">⚡</div>
+                <div class="btn-fancy-text">Analyze & Extract Input</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Right Panel: Workspace -->
+    <div class="panel-workspace">
+        <div class="tabs">
+            <div class="tab active" data-type="overview">⚡ Overview</div>
+            <div class="tab" data-type="ip">IP Address <span class="badge" id="count-ip">0</span></div>
+            <div class="tab" data-type="domain">Domain / URL <span class="badge" id="count-domain">0</span></div>
+            <div class="tab" data-type="hash">File Hash <span class="badge" id="count-hash">0</span></div>
+            <div class="tab" data-type="bookmarks">Bookmarks</div>
+        </div>
+
+        <div class="sources-wrapper">
+            <!-- Source Toolbar -->
+            <div class="sources-header hidden" id="sources-header">
+                <div class="sh-left">Select Sources</div>
+                <div class="sh-right">
+                    <button class="btn-fancy btn-sm" id="select-all-btn">
+                        <div class="btn-fancy-icon">☑️</div>
+                        <div class="btn-fancy-text">All</div>
+                    </button>
+                    <button class="btn-fancy btn-sm" id="deselect-all-btn">
+                        <div class="btn-fancy-icon">⬜</div>
+                        <div class="btn-fancy-text">None</div>
+                    </button>
+                    <button class="btn-fancy btn-sm" id="sort-sources-btn">
+                        <div class="btn-fancy-icon">🔤</div>
+                        <div class="btn-fancy-text">Sort</div>
+                    </button>
+                    <button class="btn-fancy btn-sm" id="add-source-header-btn">
+                        <div class="btn-fancy-icon">➕</div>
+                        <div class="btn-fancy-text">Add</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sources-container">
+                <!-- Overview Dashboard -->
+                <div id="overview-dashboard" class="overview-dashboard"></div>
+
+                <!-- Source Grid -->
+                <div id="sources-grid" class="sources-grid hidden"></div>
+                
+                <div id="no-data-msg" class="hidden" style="text-align: center; padding: 60px; color: var(--text-muted);">
+                    <!-- Placeholder text injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-stats" id="toolbar-stats">
+                <div class="stat-item" id="stat-item-entities">Entities: <span id="stat-entities">0</span></div>
+                <div style="opacity:0.3" id="stat-separator">|</div>
+                <div class="stat-item" id="stat-item-sources">Sources: <span id="stat-sources">0</span></div>
+            </div>
+            
+            <button class="btn-fancy btn-primary hidden" id="launch-modal-btn" style="min-width: 150px; flex: 0; margin-left: auto;">
+                <div class="btn-fancy-icon">🚀</div>
+                <div class="btn-fancy-text" id="launch-btn-text">Investigate</div>
+            </button>
+        </div>
+    </div>
+</main>
+
+<!-- Investigation Modal -->
+<div class="modal-overlay" id="investigation-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>🔎 Investigation Workbench</h2>
+            <button class="icon-btn close-modal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="investigation-grid">
+                <!-- Column 1: Entities -->
+                <div class="inv-column">
+                    <div class="inv-column-header">
+                        <span>Extracted Entities (<span id="inv-entity-count">0</span>)</span>
+                        <div class="flex-gap" style="font-size:0.8rem; text-transform:none; font-weight:normal;">
+                             <label for="modal-defang">Defang</label>
+                             <label class="toggle-switch"> 
+                                <input type="checkbox" id="modal-defang"> 
+                                <span class="toggle-slider"></span> 
+                             </label>
+                        </div>
+                    </div>
+                    <div class="inv-list" id="inv-entity-list"></div>
+                </div>
+                <!-- Column 2: Sources & Actions -->
+                <div class="inv-column" style="background:var(--bg-body);">
+                    <div class="inv-column-header">
+                        <span id="inv-source-count-display">Target Sources (0)</span>
+                    </div>
+                    <div class="inv-list" id="inv-source-list" style="padding: 10px; max-height: 200px;"></div>
+                    
+                    <div style="padding: 15px; display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border); background:var(--bg-panel); flex:none;">
+                        <button class="btn-fancy btn-primary" id="execute-btn">
+                            <div class="btn-fancy-icon">🌐</div>
+                            <div class="btn-fancy-text">Open All Tabs</div>
+                        </button>
+                        <hr style="width:100%; border:0; border-top:1px solid var(--border); margin:5px 0;">
+                        <button class="btn-fancy" id="generate-report-btn">
+                            <div class="btn-fancy-icon">📋</div>
+                            <div class="btn-fancy-text">Copy Report</div>
+                        </button>
+                        <div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">
+                            Includes Verdicts & Notes
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-modal">
+    <div class="modal" style="max-width: 650px; height: 600px;">
+        <div class="modal-header">
+            <h2>⚙️ Settings</h2>
+            <button class="icon-btn close-modal">×</button>
+        </div>
+        
+        <div class="modal-tabs">
+            <div class="modal-tab active" data-tab="appearance">Appearance</div>
+            <div class="modal-tab" data-tab="security">Security & Output</div>
+            <div class="modal-tab" data-tab="sources">Custom Sources</div>
+        </div>
+
+        <div class="modal-body">
+            <!-- Appearance Tab -->
+            <div id="tab-appearance" class="modal-tab-content active">
+                <div class="form-group">
+                    <label>Application Theme</label>
+                    <div class="theme-selector">
+                        <div class="theme-card" id="theme-card-light" onclick="setTheme('light')">
+                            <span class="theme-icon">☀️</span>
+                            <span class="theme-name">Light Mode</span>
+                        </div>
+                        <div class="theme-card" id="theme-card-dark" onclick="setTheme('dark')">
+                            <span class="theme-icon">🌙</span>
+                            <span class="theme-name">Dark Mode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security & Output Tab -->
+            <div id="tab-security" class="modal-tab-content">
+                 <div class="form-group">
+                    <label>Global De-fang</label>
+                    <div class="flex-gap" style="margin-bottom:10px;">
+                        <label class="toggle-switch"> 
+                            <input type="checkbox" id="setting-defang"> 
+                            <span class="toggle-slider"></span> 
+                        </label>
+                        <span>Replace <code>.</code> with <code>[.]</code>, <code>http</code> with <code>hxxp</code></span>
+                    </div>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin: 20px 0;">
+
+                <div class="form-group">
+                    <label>Report Separator</label>
+                    <select class="form-select" id="setting-separator">
+                        <option value="newline">Double Newline (Standard)</option>
+                        <option value="single">Single Newline (Compact)</option>
+                        <option value="dash">Dashes (---)</option>
+                        <option value="comma">Comma Separated</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Reference URLs in Report</label>
+                    <div class="flex-gap">
+                        <label class="toggle-switch"> 
+                            <input type="checkbox" id="setting-reference"> 
+                            <span class="toggle-slider"></span> 
+                        </label>
+                        <span>Include list of lookups for each entity.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Sources Tab -->
+            <div id="tab-sources" class="modal-tab-content">
+                <div style="background: var(--bg-body); padding: 15px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <div class="form-group">
+                        <label>ID <span class="text-danger">*</span></label>
+                        <input type="text" class="form-input" id="cs-id" placeholder="MY_TOOL (A-Z, _ only)" style="text-transform: uppercase;">
+                    </div>
+                    <div class="flex-gap" style="margin-bottom:15px;">
+                        <div style="flex:1;">
+                            <label>Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-input" id="cs-name" placeholder="My Internal Tool">
+                        </div>
+                        <div style="width:140px;">
+                            <label>Type</label>
+                            <select class="form-select" id="cs-type">
+                                <option value="ip">IP</option>
+                                <option value="domain">Domain</option>
+                                <option value="hash">Hash</option>
+                                <option value="bookmarks">Bookmark</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Home URL <span class="text-danger">*</span></label>
+                        <input type="text" class="form-input" id="cs-home" placeholder="https://tool.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Lookup URL (Optional)</label>
+                        <input type="text" class="form-input" id="cs-lookup" placeholder="https://tool.com/search?q=">
+                    </div>
+                    <button class="btn-fancy btn-primary" id="add-custom-source-btn">
+                        <div class="btn-fancy-icon">➕</div>
+                        <div class="btn-fancy-text">Add Source</div>
+                    </button>
+                </div>
+
+                <h4>Your Custom Sources</h4>
+                <div class="custom-source-list" id="custom-source-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- External Sources File -->
+<script src="sources.js"></script> 
+<!-- Mock fallback if file missing -->
+<script>
+    if (typeof sources === 'undefined') {
+        window.sources = {
+            ip: [ { id: 'AIPDB', name: 'AbuseIPDB', url: 'https://www.abuseipdb.com/', lookupurl: 'https://www.abuseipdb.com/check/' }, { id: 'IPQS', name: 'IPQualityScore', url: 'https://www.ipqualityscore.com/', lookupurl: 'https://www.ipqualityscore.com/vpn-ip-address-check/lookup/' }, { id: 'VT', name: 'VirusTotal', url: 'https://www.virustotal.com/', lookupurl: 'https://www.virustotal.com/gui/ip-address/' }, { id: 'GGL', name: 'Google Search', url: 'https://google.com', lookupurl: 'https://google.com/search?q=' } ],
+            domain: [ { id: 'URLSCAN', name: 'urlscan.io', url: 'https://urlscan.io/', lookupurl: 'https://urlscan.io/search/#' }, { id: 'BRWLR', name: 'Browserling', url: 'https://www.browserling.com/', lookupurl: 'https://www.browserling.com/browse/win10/chrome127/' }, { id: 'VT', name: 'VirusTotal', url: 'https://www.virustotal.com/', lookupurl: 'https://www.virustotal.com/gui/domain/' }, { id: 'GGL', name: 'Google Search', url: 'https://google.com', lookupurl: 'https://google.com/search?q=' } ],
+            hash: [ { id: 'VT', name: 'VirusTotal', url: 'https://www.virustotal.com/', lookupurl: 'https://www.virustotal.com/gui/file/' }, { id: 'ARUN', name: 'Any.Run', url: 'https://app.any.run/', lookupurl: 'https://app.any.run/submissions/sample/' }, { id: 'HYBAN', name: 'Hybrid Analysis', url: 'https://www.hybrid-analysis.com', lookupurl: 'https://www.hybrid-analysis.com/sample/' } ],
+            bookmarks: [ { id: 'GGADV', name: 'Google Adv Search', url: 'https://www.google.com/advanced_search' }, { id: 'HIBP', name: 'Have I Been Pwned', url: 'https://haveibeenpwned.com/' }, { id: 'OSFMW', name: 'OSINT Framework', url: 'https://osintframework.com/' }, { id: 'GOOS', name: 'Goosint', url: 'https://goosint.com/' }, { id: 'CYCHF', name: 'CyberChef', url: 'https://gchq.github.io/CyberChef/' } ]
+        };
+    }
+</script>
+
+<script>
+    /* --- APP STATE --- */
+    const app = {
+        data: { ip: [], domain: [], hash: [] },
+        selectedSources: { ip: [], domain: [], hash: [], bookmarks: [] },
+        currentTab: 'overview',
+        customSources: [],
+        verdicts: {},
+        sortDesc: false, 
+        settings: {
+            theme: 'dark',
+            defang: true,
+            separator: 'newline',
+            showReference: true 
+        }
+    };
+
+    /* --- DOM ELEMENTS --- */
+    const els = {
+        input: document.getElementById('raw-input'),
+        backdrop: document.getElementById('input-backdrop'),
+        grid: document.getElementById('sources-grid'),
+        sourcesHeader: document.getElementById('sources-header'),
+        dashboard: document.getElementById('overview-dashboard'),
+        msg: document.getElementById('no-data-msg'),
+        tabs: document.querySelectorAll('.tab'),
+        counts: {
+            ip: document.getElementById('count-ip'),
+            domain: document.getElementById('count-domain'),
+            hash: document.getElementById('count-hash')
+        },
+        statsContainer: document.getElementById('toolbar-stats'),
+        stats: {
+            ent: document.getElementById('stat-entities'),
+            src: document.getElementById('stat-sources'),
+            itemEnt: document.getElementById('stat-item-entities'),
+            itemSrc: document.getElementById('stat-item-sources'),
+            sep: document.getElementById('stat-separator')
+        },
+        launchBtn: {
+            self: document.getElementById('launch-modal-btn'),
+            text: document.getElementById('launch-btn-text'),
+            icon: document.getElementById('launch-modal-btn').querySelector('.btn-fancy-icon')
+        },
+        modals: {
+            inv: document.getElementById('investigation-modal'),
+            settings: document.getElementById('settings-modal')
+        }
+    };
+
+    /* --- INITIALIZATION --- */
+    function init() {
+        if (typeof sources !== 'undefined') window.sources = sources;
+        
+        els.input.value = ''; 
+        loadSettings();
+        mergeSources();
+        setupEvents();
+        renderOverview(); 
+        switchTab('overview');
+    }
+
+    /* --- LOGIC: SETTINGS --- */
+    function loadSettings() {
+        const s = localStorage.getItem('totalosint_settings');
+        if(s) app.settings = {...app.settings, ...JSON.parse(s)};
+        setTheme(app.settings.theme);
+        document.getElementById('setting-defang').checked = app.settings.defang;
+        document.getElementById('modal-defang').checked = app.settings.defang;
+        document.getElementById('setting-reference').checked = app.settings.showReference;
+        document.getElementById('setting-separator').value = app.settings.separator;
+        
+        const cs = localStorage.getItem('totalosint_custom_sources');
+        if(cs) app.customSources = JSON.parse(cs);
+    }
+    function saveSettings() { localStorage.setItem('totalosint_settings', JSON.stringify(app.settings)); }
+    
+    function setTheme(theme) {
+        app.settings.theme = theme;
+        if(theme === 'light') document.body.classList.add('theme-light');
+        else document.body.classList.remove('theme-light');
+        
+        document.getElementById('theme-card-light').classList.toggle('active', theme === 'light');
+        document.getElementById('theme-card-dark').classList.toggle('active', theme === 'dark');
+        saveSettings();
+    }
+
+    function mergeSources() {
+        app.customSources.forEach(cs => {
+            let type = cs.type; 
+            if(window.sources[type] && !window.sources[type].find(x => x.id === cs.id)) {
+                window.sources[type].push(cs);
+            }
+        });
+    }
+
+    function fullReset() {
+        els.input.value = '';
+        app.data = { ip: [], domain: [], hash: [] };
+        app.selectedSources = { ip: [], domain: [], hash: [], bookmarks: [] };
+        app.verdicts = {};
+        els.backdrop.innerHTML = '';
+        ['ip','domain','hash'].forEach(k => els.counts[k].innerText = 0);
+        renderOverview();
+        switchTab('overview');
+        toast("Application Reset", "success");
+    }
+
+    /* --- LOGIC: ANALYSIS & EXTRACTION --- */
+    const R = {
+        // URL: Matches http(s) followed by non-whitespace/quote characters
+        url: /https?:\/\/[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}(?:\/[^\s<>"']*)?/g,
+        
+        /* 
+           STRUCTURAL IPv6 REGEX (Greedy)
+           1. Full Address (8 groups)
+           2. Middle Compressed (Prefix ending in :) + (::) + (Suffix starting with Hex)
+           3. Leading Compressed (::) + (Suffix starting with Hex)
+           4. Trailing Compressed (Prefix ending in :) + (::)
+           5. Loopback (::)
+        */
+        ipv6: /((?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?|::(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?)/g,
+
+        ipv4: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+        hash: /\b[a-fA-F0-9]{32}\b|\b[a-fA-F0-9]{40}\b|\b[a-fA-F0-9]{64}\b/g,
+        
+        // Domain: Negative lookbehind ensures we don't match inside existing URLs
+        domain: /(?<![\w@\.\-\/])\b([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\b/gi,
+    };
+
+    function analyzeInput() {
+        const text = els.input.value;
+        app.data = { ip: [], domain: [], hash: [] };
+        if(!text.trim()) {
+            fullReset();
+            return;
+        }
+
+        // 1. Extract URLs
+        let rawURLs = text.match(R.url) || [];
+        rawURLs = rawURLs.map(u => u.replace(/[.,;?!:)"'\]>]+$/, "")); // Strip trailing punctuation
+
+        // 2. Extract IOCs
+        const rawIPv6s = text.match(R.ipv6) || [];
+        const rawIPv4s = text.match(R.ipv4) || [];
+        const rawHashes = text.match(R.hash) || [];
+        const rawDomains = text.match(R.domain) || [];
+
+        // --- PROCESSING ---
+
+        // URLs & Derived Domains
+        const urlSet = new Set(rawURLs);
+        urlSet.forEach(u => {
+            // Add the Full URL
+            app.data.domain.push({ val: u, type: 'URL' });
+            
+            // Extract and Add the Hostname (Domain) from the URL
+            try {
+                // Ensure protocol exists for parsing
+                const urlToParse = u.startsWith('http') ? u : 'http://' + u;
+                const urlObj = new URL(urlToParse); 
+                // Only add if hostname looks like a domain (has a dot)
+                if (urlObj.hostname && urlObj.hostname.includes('.')) {
+                    app.data.domain.push({ val: urlObj.hostname, type: 'Domain' });
+                }
+            } catch(e) { /* Invalid URL structure, skip domain extraction */ }
+        });
+
+        // Domains (Standalone)
+        [...new Set(rawDomains)].forEach(d => {
+            if(d.match(/^\d+\.\d+\.\d+\.\d+$/)) return; // Skip IPs that look like domains
+            app.data.domain.push({ val: d, type: 'Domain' });
+        });
+
+        // IPs
+        [...new Set(rawIPv6s)].forEach(ip => app.data.ip.push({ val: ip, type: 'IPv6' }));
+        [...new Set(rawIPv4s)].forEach(ip => app.data.ip.push({ val: ip, type: 'IPv4' }));
+        
+        // Hashes
+        [...new Set(rawHashes)].forEach(h => {
+            let t = 'Hash';
+            if(h.length === 32) t = 'MD5';
+            else if(h.length === 40) t = 'SHA-1';
+            else if(h.length === 64) t = 'SHA-256';
+            app.data.hash.push({ val: h, type: t });
+        });
+        
+        // De-duplicate the main arrays
+        app.data.domain = removeDuplicates(app.data.domain);
+        app.data.ip = removeDuplicates(app.data.ip);
+        app.data.hash = removeDuplicates(app.data.hash);
+
+        // Sorting
+        const sorter = (a, b) => a.val.localeCompare(b.val, undefined, { numeric: true });
+        app.data.ip.sort(sorter);
+        app.data.domain.sort(sorter);
+        app.data.hash.sort(sorter);
+
+        updateCounts();
+        renderOverview();
+        generateHighlights();
+        switchTab('overview');
+    }
+
+    function removeDuplicates(arr) {
+        const unique = new Set();
+        return arr.filter(item => {
+            const key = item.val + '|' + item.type;
+            if(unique.has(key)) return false;
+            unique.add(key);
+            return true;
+        });
+    }
+
+    function updateCounts() {
+        els.counts.ip.innerText = app.data.ip.length;
+        els.counts.domain.innerText = app.data.domain.length;
+        els.counts.hash.innerText = app.data.hash.length;
+    }
+
+    function renderOverview() {
+        const dash = els.dashboard;
+        dash.innerHTML = '';
+
+        const totalItems = app.data.ip.length + app.data.domain.length + app.data.hash.length;
+
+        if(totalItems === 0) {
+            dash.innerHTML = `
+                <div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:60px 20px;">
+                    <div style="font-size: 3rem; margin-bottom: 15px; opacity:0.8;">👋</div>
+                    <div style="font-size: 1.1rem; font-weight:500; margin-bottom:5px;">Ready to Analyze</div>
+                    <div style="font-size: 0.9rem;">Paste text on the left to extract IPs, Domains, and Hashes.<br>Otherwise, you can still open Base URLs.</div>
+                </div>
+            `;
+            updateUI(); 
+            return;
+        }
+
+        const createGroupCard = (key, title) => {
+            const items = app.data[key];
+            if(items.length === 0) return;
+
+            const subgroups = {};
+            items.forEach(i => {
+                if(!subgroups[i.type]) subgroups[i.type] = [];
+                subgroups[i.type].push(i.val);
+            });
+
+            const card = document.createElement('div');
+            card.className = 'ov-card';
+            
+            const header = document.createElement('div');
+            header.className = 'ov-header';
+            header.innerHTML = `<span>${title}</span> <span>${items.length} ➔</span>`;
+            header.onclick = () => switchTab(key);
+            card.appendChild(header);
+
+            const content = document.createElement('div');
+            content.className = 'ov-content';
+            
+            Object.keys(subgroups).sort().forEach(subKey => {
+                const subTitle = document.createElement('div');
+                subTitle.className = 'ov-sub-title';
+                subTitle.innerText = subKey;
+                content.appendChild(subTitle);
+                
+                subgroups[subKey].forEach(val => {
+                    const row = document.createElement('div');
+                    row.className = 'ov-row';
+                    const safeVal = val.replace(/'/g, "\\'");
+                    row.innerHTML = `
+                        <span class="ov-val" title="${val}">${val}</span>
+                        <button class="ov-remove-btn" onclick="removeEntity('${key}', '${safeVal}')" title="Remove from list">×</button>
+                    `;
+                    content.appendChild(row);
+                });
+            });
+
+            card.appendChild(content);
+            dash.appendChild(card);
+        };
+
+        createGroupCard('ip', 'IP Address');
+        createGroupCard('domain', 'Domain / URL');
+        createGroupCard('hash', 'File Hash');
+        updateUI();
+    }
+
+    window.removeEntity = (type, val) => {
+        app.data[type] = app.data[type].filter(item => item.val !== val);
+        updateCounts();
+        renderOverview();
+    };
+
+    function generateHighlights() {
+        let text = els.input.value;
+        if(!text) { els.backdrop.innerHTML = ''; return; }
+        text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        const wrap = (t, rx, cls) => t.replace(rx, m => `<mark class="${cls}">${m}</mark>`);
+        
+        // Order matters for highlighting to avoid overlapping tags
+        text = wrap(text, R.hash, 'type-hash');
+        text = wrap(text, R.url, 'type-domain'); 
+        text = wrap(text, R.domain, 'type-domain'); 
+        text = wrap(text, R.ipv6, 'type-ip');
+        text = wrap(text, R.ipv4, 'type-ip');
+        
+        els.backdrop.innerHTML = text.replace(/\n/g, '<br>') + '<br>';
+        updateHighlightMode();
+    }
+
+    function updateHighlightMode() {
+        els.backdrop.className = 'input-backdrop';
+        els.backdrop.classList.add(`mode-${app.currentTab}`);
+    }
+
+    function syncScroll() {
+        els.backdrop.scrollTop = els.input.scrollTop;
+        els.backdrop.scrollLeft = els.input.scrollLeft;
+    }
+
+    /* --- LOGIC: UI & TABS --- */
+    function switchTab(type) {
+        app.currentTab = type;
+        els.tabs.forEach(t => t.classList.toggle('active', t.dataset.type === type));
+        
+        const isOverview = type === 'overview';
+        els.dashboard.classList.toggle('hidden', !isOverview);
+        els.grid.classList.toggle('hidden', isOverview);
+        els.sourcesHeader.classList.toggle('hidden', isOverview);
+        
+        if(type === 'overview') {
+            els.launchBtn.self.classList.add('hidden');
+        } else {
+            els.launchBtn.self.classList.remove('hidden');
+            if(type === 'bookmarks') {
+                els.launchBtn.text.innerText = "Open";
+                els.launchBtn.icon.innerText = "🌐";
+                els.launchBtn.self.onclick = executeInvestigation; 
+            } else {
+                els.launchBtn.text.innerText = "Investigate";
+                els.launchBtn.icon.innerText = "🚀";
+                els.launchBtn.self.onclick = openInvestigation; 
+            }
+        }
+
+        if(type !== 'overview') {
+            els.msg.innerHTML = `<i>No entities detected for this category.<br>You can still open Base URLs.</i>`;
+        }
+
+        if(!isOverview) renderSources();
+        updateHighlightMode();
+        updateUI();
+    }
+
+    function getSourcesForTab(tab) {
+        return window.sources[tab] || [];
+    }
+
+    function renderSources() {
+        const list = getSourcesForTab(app.currentTab);
+        
+        list.sort((a,b) => {
+            const cmp = a.name.localeCompare(b.name);
+            return app.sortDesc ? -cmp : cmp;
+        });
+
+        els.grid.innerHTML = '';
+        list.forEach(src => {
+            const isSel = app.selectedSources[app.currentTab].includes(src.id);
+            const hasLookup = !!src.lookupurl;
+            
+            const el = document.createElement('div');
+            el.className = `source-card ${isSel ? 'selected' : ''}`;
+            el.title = src.name; 
+            
+            let html = `<span class="source-name">${src.name}</span>`;
+            if(hasLookup) html += `<span class="lookup-indicator" title="Lookup Available">🔍</span>`;
+            
+            el.innerHTML = html;
+            el.onclick = () => toggleSource(src.id);
+            els.grid.appendChild(el);
+        });
+    }
+
+    function toggleSource(id) {
+        const arr = app.selectedSources[app.currentTab];
+        const idx = arr.indexOf(id);
+        if (idx > -1) arr.splice(idx, 1);
+        else arr.push(id);
+        renderSources();
+        updateUI();
+    }
+
+    function updateUI() {
+        const tab = app.currentTab;
+        const srcCount = app.selectedSources[tab]?.length || 0;
+        
+        const totalEnt = app.data.ip.length + app.data.domain.length + app.data.hash.length;
+        const entCount = (tab === 'bookmarks') ? 0 : app.data[tab]?.length || 0;
+        
+        let showEnt = false, showSrc = false;
+        let entVal = entCount;
+
+        if (tab === 'overview') {
+            showEnt = true; entVal = totalEnt;
+            showSrc = false;
+        } else if (tab === 'bookmarks') {
+            showEnt = false;
+            showSrc = true;
+        } else {
+            showEnt = true;
+            showSrc = true;
+        }
+
+        els.stats.ent.innerText = entVal;
+        els.stats.src.innerText = srcCount;
+        
+        els.stats.itemEnt.classList.toggle('hidden', !showEnt);
+        els.stats.itemSrc.classList.toggle('hidden', !showSrc);
+        els.stats.sep.classList.toggle('hidden', (!showEnt || !showSrc));
+
+        if(tab !== 'bookmarks' && tab !== 'overview') {
+            const hasData = entCount > 0;
+            els.msg.style.display = hasData ? 'none' : 'block';
+        } else {
+            els.msg.style.display = 'none';
+        }
+    }
+
+    /* --- LOGIC: INVESTIGATION --- */
+    function openInvestigation() {
+        const tab = app.currentTab;
+        if(tab === 'overview') return;
+        if(tab === 'bookmarks') return; 
+
+        const sourceIds = app.selectedSources[tab];
+        if (sourceIds.length === 0) return toast("Select at least one source.", "error");
+        
+        let entities = app.data[tab];
+        
+        if(entities.length === 0) {
+            document.getElementById('inv-entity-count').innerText = 0;
+            document.getElementById('inv-entity-list').innerHTML = `
+                <div style="padding:20px; text-align:center; color:var(--text-muted);">
+                    No entities detected for this category.<br>You can still open Base URLs.
+                </div>
+            `;
+        } else {
+            document.getElementById('inv-entity-count').innerText = entities.length;
+            const list = document.getElementById('inv-entity-list');
+            list.innerHTML = '';
+
+            entities.forEach(entObj => {
+                const ent = entObj.val;
+                if(!app.verdicts[ent]) app.verdicts[ent] = { status: 'Untriaged', note: '' };
+                const v = app.verdicts[ent];
+                const displayEnt = app.settings.defang ? defang(ent) : ent;
+
+                const div = document.createElement('div');
+                div.className = 'inv-item';
+                div.innerHTML = `
+                    <div class="inv-item-header">
+                        <span class="inv-val" title="${ent}">${displayEnt}</span>
+                        <button class="icon-btn" title="Copy" onclick="copyToClip('${displayEnt}', true)">📋</button>
+                    </div>
+                    <div class="inv-controls">
+                        <select class="verdict-select" onchange="updateVerdict('${ent}', 'status', this.value)">
+                            <option value="Untriaged" ${v.status === 'Untriaged'?'selected':''}>Untriaged</option>
+                            <option value="Undetermined" ${v.status === 'Undetermined'?'selected':''}>❓ Undetermined</option>
+                            <option value="Safe" ${v.status === 'Safe'?'selected':''}>✅ Safe</option>
+                            <option value="Suspicious" ${v.status === 'Suspicious'?'selected':''}>⚠️ Suspicious</option>
+                            <option value="Malicious" ${v.status === 'Malicious'?'selected':''}>⛔ Malicious</option>
+                        </select>
+                        <input type="text" class="note-input" placeholder="Notes..." value="${v.note}" oninput="updateVerdict('${ent}', 'note', this.value)">
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        const srcList = document.getElementById('inv-source-list');
+        srcList.innerHTML = '';
+        const activeSrc = window.sources[tab].filter(s => sourceIds.includes(s.id));
+        document.getElementById('inv-source-count-display').innerText = `Target Sources (${activeSrc.length})`;
+        activeSrc.forEach(s => {
+            srcList.innerHTML += `<div style="font-size:0.85rem; padding:4px 0;">• ${s.name} <span style="opacity:0.6;font-size:0.7em;">${s.lookupurl?'(Lookup)':'(Base)'}</span></div>`;
+        });
+
+        els.modals.inv.classList.add('open');
+    }
+
+    function executeInvestigation() {
+        const tab = app.currentTab;
+        const sourceIds = app.selectedSources[tab];
+        
+        if(tab === 'bookmarks') {
+            const allSrcs = getSourcesForTab('bookmarks');
+            const selected = allSrcs.filter(s => sourceIds.includes(s.id));
+            if(selected.length === 0) return toast("No bookmarks selected.", "error");
+            
+            if(selected.length > 15 && !confirm(`Open ${selected.length} tabs?`)) return;
+            selected.forEach(s => window.open(s.url, '_blank'));
+            return;
+        }
+
+        let entities = app.data[tab];
+        if(entities.length === 0) entities = [{val:''}]; 
+
+        const sources = window.sources[tab].filter(s => sourceIds.includes(s.id));
+
+        let urls = [];
+        entities.forEach(obj => {
+            const ent = obj.val;
+            sources.forEach(src => {
+                let target = src.url; 
+                if (ent && ent.trim() !== '' && src.lookupurl) {
+                    target = src.lookupurl + encodeURIComponent(ent);
+                }
+                urls.push(target);
+            });
+        });
+
+        urls = [...new Set(urls)];
+        if(urls.length === 0) return toast("No URLs generated.", "warning");
+        if(urls.length > 15 && !confirm(`Open ${urls.length} tabs?`)) return;
+        urls.forEach(u => window.open(u, '_blank'));
+    }
+
+    function generateReport() {
+        const entities = app.data[app.currentTab] || [];
+        if(entities.length === 0) return toast("No entities to report.", "warning");
+
+        let report = "";
+        const sepMap = { 'newline': '\n\n', 'single': '\n', 'dash': '\n---\n', 'comma': ', ' };
+        const sep = sepMap[app.settings.separator] || '\n\n';
+
+        const sourceIds = app.selectedSources[app.currentTab];
+        const activeSources = window.sources[app.currentTab].filter(s => sourceIds.includes(s.id));
+
+        entities.forEach((obj, i) => {
+            const ent = obj.val;
+            const v = app.verdicts[ent] || { status: 'Untriaged', note: '' };
+            const displayEnt = app.settings.defang ? defang(ent) : ent;
+            
+            report += `${obj.type}: ${displayEnt}\n`;
+            report += `Verdict: ${v.status}\n`;
+            if(v.note) report += `Note: ${v.note}\n`;
+            
+            if(app.settings.showReference && activeSources.length > 0) {
+                report += `References:\n`;
+                activeSources.forEach(src => {
+                     let url = src.url;
+                     if(ent && src.lookupurl) url = src.lookupurl + encodeURIComponent(ent);
+                     report += `- ${url}\n`;
+                });
+            }
+            if(i < entities.length - 1) report += sep;
+        });
+
+        copyToClip(report);
+    }
+
+    /* --- HELPERS --- */
+    window.updateVerdict = (ent, key, val) => {
+        if(!app.verdicts[ent]) app.verdicts[ent] = { status: 'Untriaged', note: '' };
+        app.verdicts[ent][key] = val;
+    };
+    window.copyToClip = (text, isEntity = false) => {
+        navigator.clipboard.writeText(text).then(() => toast(isEntity ? "Copied!" : "Report copied!", "success"));
+    };
+    function defang(str) { return str ? str.replace(/\./g, '[.]').replace(/http/gi, 'hxxp') : ''; }
+    function toast(msg, type='info') {
+        const t = document.getElementById('toast');
+        t.innerHTML = `<span>${type === 'error' ? '⚠️' : type === 'warning' ? '⚠️' : '✅'}</span> ${msg}`;
+        t.className = `toast visible ${type}`;
+        setTimeout(() => t.classList.remove('visible'), 3000);
+    }
+
+    /* --- EVENT BINDING --- */
+    function setupEvents() {
+        document.getElementById('analyze-btn').onclick = analyzeInput;
+        document.getElementById('clear-input-btn').onclick = fullReset;
+        document.getElementById('copy-input-btn').onclick = () => copyToClip(els.input.value);
+        els.input.addEventListener('scroll', syncScroll);
+        
+        document.getElementById('branding-btn').onclick = fullReset;
+
+        // Source Header
+        document.getElementById('select-all-btn').onclick = () => {
+            const list = getSourcesForTab(app.currentTab);
+            app.selectedSources[app.currentTab] = list.map(s => s.id);
+            renderSources(); updateUI();
+        };
+        document.getElementById('deselect-all-btn').onclick = () => {
+            app.selectedSources[app.currentTab] = [];
+            renderSources(); updateUI();
+        };
+        document.getElementById('sort-sources-btn').onclick = () => {
+            app.sortDesc = !app.sortDesc;
+            renderSources();
+        };
+        document.getElementById('add-source-header-btn').onclick = () => openSettings('sources');
+
+        // Modal / Tab
+        els.tabs.forEach(t => t.onclick = () => switchTab(t.dataset.type));
+        document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+        });
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', (e) => {
+            if(e.target === m) m.classList.remove('open');
+        }));
+
+        document.getElementById('execute-btn').onclick = executeInvestigation;
+        document.getElementById('generate-report-btn').onclick = generateReport;
+        
+        document.getElementById('modal-defang').onchange = (e) => {
+            app.settings.defang = e.target.checked;
+            document.getElementById('setting-defang').checked = e.target.checked;
+            saveSettings();
+            if(els.modals.inv.classList.contains('open')) openInvestigation(); 
+        };
+
+        document.getElementById('settings-btn').onclick = () => openSettings('appearance');
+        
+        // Settings Tab Logic
+        document.querySelectorAll('.modal-tab').forEach(t => t.onclick = function() {
+            document.querySelectorAll('.modal-tab').forEach(x => x.classList.remove('active'));
+            document.querySelectorAll('.modal-tab-content').forEach(x => x.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
+        });
+
+        // Settings Controls
+        document.getElementById('setting-defang').onchange = (e) => {
+            app.settings.defang = e.target.checked;
+            saveSettings();
+        };
+        document.getElementById('setting-separator').onchange = (e) => { app.settings.separator = e.target.value; saveSettings(); };
+        document.getElementById('setting-reference').onchange = (e) => { app.settings.showReference = e.target.checked; saveSettings(); };
+        
+        document.getElementById('cs-id').oninput = function() { this.value = this.value.toUpperCase().replace(/[^A-Z_]/g, ''); };
+        
+        // Add Source logic
+        const typeSelect = document.getElementById('cs-type');
+        const lookupInput = document.getElementById('cs-lookup');
+        
+        typeSelect.onchange = () => {
+            if(typeSelect.value === 'bookmarks') {
+                lookupInput.disabled = true;
+                lookupInput.value = '';
+                lookupInput.placeholder = 'N/A for Bookmarks';
+            } else {
+                lookupInput.disabled = false;
+                lookupInput.placeholder = 'https://tool.com/search?q=';
+            }
+        };
+
+        document.getElementById('add-custom-source-btn').onclick = addCustomSource;
+    }
+
+    function openSettings(tabName) {
+        renderCustomSourcesList();
+        document.querySelector(`.modal-tab[data-tab="${tabName}"]`).click();
+        els.modals.settings.classList.add('open');
+    }
+
+    function addCustomSource() {
+        const id = document.getElementById('cs-id').value;
+        const name = document.getElementById('cs-name').value;
+        const type = document.getElementById('cs-type').value;
+        const home = document.getElementById('cs-home').value;
+        const lookup = document.getElementById('cs-lookup').value;
+
+        if(!id || !name || !home) return toast("ID, Name, and Home URL required", "error");
+        if(app.customSources.find(c => c.id === id)) return toast("ID already exists", "error");
+        
+        const newSrc = { id, name, type, url: home, lookupurl: lookup || '' };
+        app.customSources.push(newSrc);
+        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
+        if(window.sources[type]) window.sources[type].push(newSrc);
+        
+        toast("Source added!", "success");
+        renderCustomSourcesList();
+        document.getElementById('cs-id').value = '';
+        document.getElementById('cs-name').value = '';
+        document.getElementById('cs-home').value = '';
+        document.getElementById('cs-lookup').value = '';
+        if(app.currentTab === type) renderSources();
+    }
+
+    function removeCustomSource(id) {
+        app.customSources = app.customSources.filter(s => s.id !== id);
+        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
+        renderCustomSourcesList();
+        toast("Source removed (refresh recommended)", "warning");
+    }
+
+    function renderCustomSourcesList() {
+        const container = document.getElementById('custom-source-list');
+        if(app.customSources.length === 0) {
+            container.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">No custom sources added yet.</div>';
+            return;
+        }
+        container.innerHTML = '';
+        app.customSources.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'custom-source-item';
+            div.innerHTML = `
+                <div><div style="font-weight:600; font-size:0.9rem;">${s.name}</div><div style="font-size:0.75rem; color:var(--text-muted);">ID: ${s.id}</div></div>
+                <button class="icon-btn" onclick="removeCustomSource('${s.id}')" style="color:var(--danger)">🗑️</button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
