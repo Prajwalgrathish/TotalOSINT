@@ -4,13 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TotalOSINT</title>
-    <meta name="description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit. Extract IPs, Domains, and Hashes from logs and launch investigations instantly.">
+    <!-- Original Long Description -->
+    <meta name="description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. Instantly extract IOCs (IPs, Domains, Hashes) from raw logs and launch bulk investigations across dozens of threat intelligence sources. Zero-data-persistence workflow for SOC and DFIR teams. No installation required.">
+    <meta name="keywords" content="osint, threat-intelligence, cybersecurity, soc, blue-team, incident-response, investigation, ioc-extraction, dfir, opsec, malware-analysis, security-tools, productivity, javascript, infosec, digital-forensics, threat-hunting, ioc-parser, ip-lookup, hash-lookup, reconnaissance, privacy-focused, client-side, zero-persistence, secops">
+    <!-- Open Graph / Social Sharing -->
     <meta property="og:title" content="TotalOSINT">
-    <meta property="og:description" content="Privacy-first, client-side OSINT toolkit. Extract IOCs and launch investigations.">
+    <meta property="og:description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit. Extract IOCs and launch investigations instantly.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://jhatzimalis.github.io/TotalOSINT/">
+        <meta property="og:image" content="https://jhatzimalis.github.io/TotalOSINT/social.png">
+    <!-- Twitter Card Data -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="TotalOSINT">
+    <meta name="twitter:description" content="Privacy-first, client-side OSINT toolkit for security analysts.">
+    <meta name="twitter:image" content="https://jhatzimalis.github.io/TotalOSINT/social.png">
+    <!-- Favicon (Browser Tab - Emoji) -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️‍♂️</text></svg>">
-    
+    <!-- Apple Touch Icon (Optional: Create a square PNG named 'apple-touch-icon.png' for iOS home screen) -->
+    <!-- <link rel="apple-touch-icon" href="apple-touch-icon.png"> -->
+
     <style>
         /* --- Variables --- */
         :root {
@@ -71,6 +83,9 @@
         .btn-primary { background: var(--accent); color: white; border-color: var(--accent); }
         .btn-primary .btn-fancy-icon { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
         .btn-primary:hover { background: var(--accent-hover); }
+        .btn-success { background: var(--success); color: white; border-color: var(--success); }
+        .btn-success:hover { filter: brightness(1.1); }
+        .btn-success .btn-fancy-icon { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
         
         .btn-sm { height: 28px; font-size: 0.8rem; }
         .btn-sm .btn-fancy-icon { width: 28px; font-size: 0.9rem; }
@@ -126,9 +141,6 @@
         .sh-left { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
         .sh-right { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 5px 2px; }
         
-        /* Mobile Scroll for Source Buttons */
-        .sh-right .btn-fancy { flex-shrink: 0; } 
-
         .sources-container { flex: 1; overflow-y: auto; padding: 20px; }
         .sources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
         
@@ -165,12 +177,12 @@
         /* Modals */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-overlay.open { display: flex; }
-        .modal { background: var(--bg-panel); width: 90%; max-width: 950px; max-height: 90vh; border-radius: var(--radius); display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; border: 1px solid var(--border); }
+        .modal { background: var(--bg-panel); width: 90%; max-width: 650px; height: 526px; max-height: 90vh; border-radius: var(--radius); display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; border: 1px solid var(--border); }
         .modal-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); color: var(--text-main); }
         .modal-header h2 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         .modal-body { padding: 0; overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
         
-        .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; background: var(--bg-body); overflow-x: auto; }
+        .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; background: var(--bg-body); overflow-x: auto; flex-shrink: 0; }
         .modal-tab { padding: 12px 15px; cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent; color: var(--text-muted); white-space: nowrap; }
         .modal-tab.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
         .modal-tab-content { padding: 20px; display: none; overflow-y: auto; }
@@ -196,7 +208,7 @@
 
         /* Settings Custom Sources */
         .custom-source-list { border: 1px solid var(--border); max-height: 250px; overflow-y: auto; margin-top: 10px; border-radius: 4px; display: none; }
-        .custom-source-item { padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
+        .custom-source-item { padding: 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
 
         .toast { position: fixed; bottom: var(--toast-y); right: 25px; background: #333; color: white; padding: 12px 20px; border-radius: 6px; z-index: 2000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .toast.visible { opacity: 1; transform: translateY(0); }
@@ -217,14 +229,17 @@
         .flex-gap { display: flex; gap: 10px; align-items: center; }
         
         .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 0.85rem; font-weight: 600; }
-        .form-input, .form-select { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel); color: var(--text-main); box-sizing: border-box; }
+        .form-group label { display: block; margin-bottom: 4px; font-size: 0.8rem; font-weight: 600; }
+        .form-input, .form-select { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel); color: var(--text-main); box-sizing: border-box; font-size: 0.9rem; }
+        .form-input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg-body); }
 
-        .add-source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .add-source-full { grid-column: 1 / -1; }
+        /* Compact Grid: 0.8fr ID, 2.5fr Name, 1fr Type */
+        .add-source-grid { display: grid; grid-template-columns: 0.8fr 2.5fr 1fr; gap: 10px; }
+        .add-source-full { grid-column: 1 / -1; margin-top: -5px; } /* Pull up full width inputs */
         .settings-subheader { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 15px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
 
-        #custom-source-header { display: none; margin-top: 20px; }
+        #custom-source-header { display: none; margin-top: 20px; font-size:0.9rem; }
+        #no-sources-msg { margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
 
         @media (max-width: 900px) {
             main { flex-direction: column; }
@@ -232,11 +247,12 @@
             .investigation-grid { grid-template-columns: 1fr; }
             .inv-column { border-right: none; border-bottom: 1px solid var(--border); }
             .inv-column:last-child { height: auto; max-height: 250px; flex: none; }
-            /* Mobile Toolbar Fix: No wrap, scroll buttons */
             .toolbar { height: auto; flex-wrap: nowrap; padding: 10px; gap: 10px; }
             .toolbar-stats { width: auto; gap: 10px; flex-shrink: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; }
             .toolbar-actions { width: auto; flex-shrink: 0; }
             .btn-fancy { min-width: 0; }
+            .add-source-grid { grid-template-columns: 1fr; }
+            .add-source-full { margin-top: 0; }
         }
     </style>
 </head>
@@ -399,7 +415,7 @@
 
 <!-- Settings Modal -->
 <div class="modal-overlay" id="settings-modal">
-    <div class="modal" style="max-width: 650px; height: 600px; max-height: 90vh;">
+    <div class="modal" style="max-width: 650px; height: 526px; max-height: 90vh;">
         <div class="modal-header">
             <h2>⚙️ Settings</h2>
             <button class="icon-btn close-modal" style="color:var(--text-main);">×</button>
@@ -437,7 +453,7 @@
                     </div>
                 </div>
                 
-                <div class="settings-subheader" style="margin-top:20px;">Output</div>
+                <div class="settings-subheader" style="margin-top:30px;">Output</div>
                 <div class="form-group">
                     <label>Reference URLs in Report</label>
                     <div class="flex-gap">
@@ -465,17 +481,17 @@
                             <input type="text" class="form-input" id="cs-id" placeholder="MY_TOOL" style="text-transform: uppercase;">
                         </div>
                         <div class="form-group">
-                            <label>Type</label>
+                            <label>Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-input" id="cs-name" placeholder="My Tool">
+                        </div>
+                        <div class="form-group">
+                            <label>Type <span class="text-danger">*</span></label>
                             <select class="form-select" id="cs-type">
                                 <option value="ip">IP</option>
                                 <option value="domain">Domain</option>
                                 <option value="hash">Hash</option>
                                 <option value="bookmarks">Bookmark</option>
                             </select>
-                        </div>
-                        <div class="form-group add-source-full">
-                            <label>Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-input" id="cs-name" placeholder="My Internal Tool">
                         </div>
                         <div class="form-group add-source-full">
                             <label>Home URL <span class="text-danger">*</span></label>
@@ -486,12 +502,18 @@
                             <input type="text" class="form-input" id="cs-lookup" placeholder="https://tool.com/search?q=">
                         </div>
                     </div>
-                    <button class="btn-fancy" id="add-custom-source-btn" style="margin-top:5px; height:32px;">
-                        <div class="btn-fancy-icon">➕</div>
-                        <div class="btn-fancy-text">Add Source</div>
-                    </button>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <button class="btn-fancy" id="add-custom-source-btn" style="height:32px;">
+                            <div class="btn-fancy-icon">➕</div>
+                            <div class="btn-fancy-text" id="add-source-text">Add Source</div>
+                        </button>
+                        <button class="btn-fancy hidden" id="cancel-edit-btn" style="height:32px; width:100px; flex:none;">
+                            <div class="btn-fancy-text">Cancel</div>
+                        </button>
+                    </div>
                 </div>
                 <h4 id="custom-source-header">Your Custom Sources</h4>
+                <div id="no-sources-msg">No custom sources added.</div>
                 <div class="custom-source-list" id="custom-source-list"></div>
             </div>
         </div>
@@ -501,6 +523,7 @@
 <div class="toast" id="toast"></div>
 
 <!-- Data -->
+<script src="sources.js"></script>
 <script>
     if (typeof sources === 'undefined') {
         window.sources = {
@@ -523,7 +546,8 @@
         disabledEntities: {}, 
         sortDesc: false, 
         settings: { theme: 'dark', defang: true, separator: 'newline', showReference: true },
-        debounceTimer: null
+        debounceTimer: null,
+        editingId: null
     };
 
     /* --- DOM ELEMENTS --- */
@@ -598,7 +622,6 @@
         app.disabledEntities = {};
         renderOverview();
         switchTab('overview');
-        toast("New Investigation Started");
     }
 
     /* --- ANALYSIS --- */
@@ -937,17 +960,21 @@
             return;
         }
 
+        // Logic for running without entities (Use Home URL)
         let entities = app.data[tab].filter(e => !app.disabledEntities[e.val]);
-        if(entities.length === 0 && app.data[tab].length > 0) return toast("All entities disabled.", "warning");
-        if(entities.length === 0) return toast("No entities found.", "warning");
+        if(entities.length === 0) entities = [{val: ''}]; // Dummy empty entity to trigger loop
+
         if(sourceIds.length === 0) return toast("Select sources first.", "error");
 
         let urls = [];
         entities.forEach(obj => {
             const ent = obj.val;
             window.sources[tab].filter(s => sourceIds.includes(s.id)).forEach(src => {
-                let target = src.url; 
-                if (ent && src.lookupurl) target = src.lookupurl + encodeURIComponent(ent);
+                let target = src.url; // Default to home URL
+                // Only use lookup if entity exists and source has lookup
+                if (ent && ent !== '' && src.lookupurl) {
+                    target = src.lookupurl + encodeURIComponent(ent);
+                }
                 urls.push(target);
             });
         });
@@ -993,8 +1020,8 @@
         if(!app.verdicts[ent]) app.verdicts[ent] = { status: 'Untriaged', note: '' };
         app.verdicts[ent][key] = val;
     };
-    window.copyToClip = (text, isEntity = false) => {
-        navigator.clipboard.writeText(text).then(() => toast(isEntity ? "Copied!" : "Report copied!", "success"));
+    window.copyToClip = (text, msg = 'Report copied!') => {
+        navigator.clipboard.writeText(text).then(() => toast(msg, "success"));
     };
     function toast(msg, type='info') {
         const t = document.getElementById('toast');
@@ -1010,7 +1037,7 @@
         
         document.getElementById('branding-btn').onclick = softReset;
         document.getElementById('clear-input-btn').onclick = clearNotes;
-        document.getElementById('copy-input-btn').onclick = () => copyToClip(els.input.value);
+        document.getElementById('copy-input-btn').onclick = () => copyToClip(els.input.value, 'Notes copied!');
 
         document.getElementById('select-all-btn').onclick = () => { app.selectedSources[app.currentTab] = window.sources[app.currentTab].map(s => s.id); renderSources(); updateUI(); };
         document.getElementById('deselect-all-btn').onclick = () => { app.selectedSources[app.currentTab] = []; renderSources(); updateUI(); };
@@ -1023,6 +1050,7 @@
         
         document.getElementById('settings-btn').onclick = () => els.modals.settings.classList.add('open');
         document.getElementById('add-custom-source-btn').onclick = addCustomSource;
+        document.getElementById('cancel-edit-btn').onclick = cancelEdit;
         
         els.launchBtns.modal.onclick = openInvestigation;
         els.launchBtns.direct.onclick = executeInvestigation;
@@ -1042,6 +1070,44 @@
         document.getElementById('setting-reference').onchange = (e) => { app.settings.showReference = e.target.checked; saveSettings(); };
         document.getElementById('modal-defang').onchange = (e) => { app.settings.defang = e.target.checked; document.getElementById('setting-defang').checked = e.target.checked; saveSettings(); if(els.modals.inv.classList.contains('open')) openInvestigation(); };
         document.getElementById('cs-id').oninput = function() { this.value = this.value.toUpperCase().replace(/[^A-Z_]/g, ''); };
+        
+        // Disable lookup for bookmarks
+        const typeSelect = document.getElementById('cs-type');
+        const lookupInput = document.getElementById('cs-lookup');
+        typeSelect.onchange = () => {
+            if(typeSelect.value === 'bookmarks') {
+                lookupInput.disabled = true; lookupInput.value = ''; lookupInput.placeholder = 'N/A';
+            } else {
+                lookupInput.disabled = false; lookupInput.placeholder = 'https://tool.com/search?q=';
+            }
+        };
+    }
+
+    window.editCustomSource = (id) => {
+        const src = app.customSources.find(s => s.id === id);
+        if(!src) return;
+        
+        // Populate
+        document.getElementById('cs-id').value = src.id;
+        document.getElementById('cs-name').value = src.name;
+        document.getElementById('cs-type').value = src.type;
+        document.getElementById('cs-home').value = src.url;
+        document.getElementById('cs-lookup').value = src.lookupurl;
+        document.getElementById('cs-type').onchange();
+        
+        // UI State
+        document.getElementById('cs-id').disabled = true; // Cannot change ID
+        document.getElementById('add-source-text').innerText = "Save Changes";
+        document.getElementById('add-custom-source-btn').classList.remove('btn-fancy');
+        document.getElementById('add-custom-source-btn').classList.add('btn-success', 'btn-fancy');
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        
+        app.editingId = id;
+    };
+
+    function cancelEdit() {
+        resetSourceForm();
+        app.editingId = null;
     }
 
     function addCustomSource() {
@@ -1052,42 +1118,84 @@
         const lookup = document.getElementById('cs-lookup').value;
 
         if(!id || !name || !home) return toast("ID, Name, and Home URL required", "error");
-        if(app.customSources.find(c => c.id === id)) return toast("ID already exists", "error");
         
+        // Check duplicate only if NEW
+        if(!app.editingId && app.customSources.find(c => c.id === id)) return toast("ID already exists", "error");
+        
+        // Remove old if editing
+        if(app.editingId) {
+            app.customSources = app.customSources.filter(s => s.id !== app.editingId);
+        }
+
         const newSrc = { id, name, type, url: home, lookupurl: lookup || '' };
         app.customSources.push(newSrc);
         localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
-        if(window.sources[type]) window.sources[type].push(newSrc);
-        toast("Source added!", "success");
+        
+        // Refresh runtime sources
+        if(window.sources[type]) {
+            // Remove old if exists in runtime (for editing)
+            window.sources[type] = window.sources[type].filter(s => s.id !== id);
+            window.sources[type].push(newSrc);
+        }
+
+        toast(app.editingId ? "Source updated!" : "Source added!", "success");
         renderCustomSourcesList();
+        resetSourceForm();
+        if(app.currentTab === type) renderSources(); // Refresh UI
+    }
+
+    function resetSourceForm() {
         document.getElementById('cs-id').value = '';
         document.getElementById('cs-name').value = '';
         document.getElementById('cs-home').value = '';
         document.getElementById('cs-lookup').value = '';
+        document.getElementById('cs-id').disabled = false;
+        document.getElementById('add-source-text').innerText = "Add Source";
+        document.getElementById('add-custom-source-btn').classList.remove('btn-success');
+        document.getElementById('cancel-edit-btn').classList.add('hidden');
+        app.editingId = null;
     }
 
     function removeCustomSource(id) {
+        if(app.editingId === id) cancelEdit();
         app.customSources = app.customSources.filter(s => s.id !== id);
         localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
         renderCustomSourcesList();
-        toast("Source removed (refresh recommended)", "warning");
+        // Remove from runtime
+        Object.keys(window.sources).forEach(key => {
+            window.sources[key] = window.sources[key].filter(s => s.id !== id);
+        });
+        renderSources();
+        toast("Source removed", "warning");
     }
 
     function renderCustomSourcesList() {
         const container = document.getElementById('custom-source-list');
         const header = document.getElementById('custom-source-header');
+        const msg = document.getElementById('no-sources-msg');
+        
         if(app.customSources.length === 0) { 
             container.style.display = 'none'; 
             header.style.display = 'none';
+            msg.style.display = 'block';
             return; 
         }
+        
         container.style.display = 'block';
         header.style.display = 'block';
+        msg.style.display = 'none';
         container.innerHTML = '';
+        
         app.customSources.forEach(s => {
             const div = document.createElement('div');
             div.className = 'custom-source-item';
-            div.innerHTML = `<div><div style="font-weight:600; font-size:0.9rem;">${s.name}</div><div style="font-size:0.75rem; color:var(--text-muted);">${s.id} (${s.type})</div></div><button class="icon-btn" onclick="removeCustomSource('${s.id}')" style="color:var(--danger)">🗑️</button>`;
+            div.innerHTML = `
+                <div><div style="font-weight:600; font-size:0.9rem;">${s.name}</div><div style="font-size:0.75rem; color:var(--text-muted);">${s.id} (${s.type})</div></div>
+                <div style="display:flex; gap:5px;">
+                    <button class="icon-btn" onclick="editCustomSource('${s.id}')" style="font-size:1rem;">✏️</button>
+                    <button class="icon-btn" onclick="removeCustomSource('${s.id}')" style="color:var(--danger); font-size:1rem;">🗑️</button>
+                </div>
+            `;
             container.appendChild(div);
         });
     }
