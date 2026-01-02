@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TotalOSINT</title>
-    <!-- Original Long Description -->
+    
+    <!-- Metadata -->
     <meta name="description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. Instantly extract IOCs (IPs, Domains, Hashes) from raw logs and launch bulk investigations across dozens of threat intelligence sources. Zero-data-persistence workflow for SOC and DFIR teams. No installation required.">
     <meta name="keywords" content="osint, threat-intelligence, cybersecurity, soc, blue-team, incident-response, investigation, ioc-extraction, dfir, opsec, malware-analysis, security-tools, productivity, javascript, infosec, digital-forensics, threat-hunting, ioc-parser, ip-lookup, hash-lookup, reconnaissance, privacy-focused, client-side, zero-persistence, secops">
+    
     <!-- Open Graph / Social Sharing -->
     <meta property="og:title" content="TotalOSINT">
     <meta property="og:description" content="TotalOSINT is a privacy-first, client-side OSINT toolkit. Extract IOCs and launch investigations instantly.">
@@ -15,15 +17,15 @@
     <meta property="og:image" content="https://jhatzimalis.github.io/TotalOSINT/social.png">
     <meta property="og:image:width" content="1280">
     <meta property="og:image:height" content="640">
+    
     <!-- Twitter Card Data -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="TotalOSINT">
     <meta name="twitter:description" content="Privacy-first, client-side OSINT toolkit for security analysts.">
     <meta name="twitter:image" content="https://jhatzimalis.github.io/TotalOSINT/social.png">
-    <!-- Favicon (Browser Tab - Emoji) -->
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕵️‍♂️</text></svg>">
-    <!-- Apple Touch Icon (Optional: Create a square PNG named 'apple-touch-icon.png' for iOS home screen) -->
-    <!-- <link rel="apple-touch-icon" href="apple-touch-icon.png"> -->
 
     <style>
         /* --- Variables --- */
@@ -66,7 +68,6 @@
         .nav-links { display: flex; gap: 10px; align-items: center; }
         .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; display: flex; align-items: center; gap: 5px; }
         .nav-link:hover { color: var(--text-light); }
-        
         .icon-btn { background: none; border: 1px solid transparent; color: inherit; font-size: 1.2rem; cursor: pointer; padding: 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .icon-btn:hover { background: rgba(255,255,255,0.1); }
 
@@ -88,21 +89,31 @@
         .btn-success { background: var(--success); color: white; border-color: var(--success); }
         .btn-success:hover { filter: brightness(1.1); }
         .btn-success .btn-fancy-icon { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.1); }
+        .btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn-danger:hover { filter: brightness(1.1); }
         
         .btn-sm { height: 28px; font-size: 0.8rem; }
         .btn-sm .btn-fancy-icon { width: 28px; font-size: 0.9rem; }
         
-        /* Icon Only Button (Square) */
         .btn-square { width: 36px; padding: 0; justify-content: center; align-items: center; flex: 0 0 36px; }
         .btn-square.btn-sm { width: 28px; flex: 0 0 28px; }
         .btn-square .btn-fancy-icon { width: 100%; border: none; background: transparent; }
+        
+        .btn-floating { position: absolute; bottom: 20px; right: 20px; width: 45px; height: 45px; border-radius: 50%; background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: transform 0.2s; z-index: 10; }
+        .btn-floating:hover { transform: scale(1.1); background: var(--accent-hover); }
 
         /* --- Main Layout --- */
         main { flex: 1; display: flex; overflow: hidden; position: relative; }
         
         /* Left Panel */
-        .panel-input { width: 400px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 5; flex-shrink: 0; }
-        .panel-header { padding: 8px 12px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
+        .panel-input { 
+            width: 300px; /* Default Desktop Width */
+            min-width: 300px; max-width: 60%;
+            background: var(--bg-panel); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; z-index: 5; flex-shrink: 0;
+            resize: horizontal; overflow: hidden; 
+        }
+        .panel-header { padding: 8px 15px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
         .header-actions { display: flex; gap: 5px; }
 
         .input-container { position: relative; flex: 1; width: 100%; overflow: hidden; background: var(--bg-panel); }
@@ -128,9 +139,8 @@
         .mode-hash mark:not(.type-hash) { background: var(--hl-dim); }
 
         /* Right Panel */
-        .panel-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-body); }
-        .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 5px; overflow-x: auto; flex-shrink: 0; scrollbar-width: none; }
-        .tabs::-webkit-scrollbar { display: none; }
+        .panel-workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-body); min-width: 0; }
+        .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 5px; overflow-x: auto; flex-shrink: 0; flex-wrap: wrap; }
         .tab { padding: 12px 15px; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); border-bottom: 3px solid transparent; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: color 0.2s; user-select: none; }
         .tab:hover { color: var(--accent); }
         .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -139,9 +149,9 @@
 
         /* Sources */
         .sources-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .sources-header { padding: 10px 15px; background: var(--bg-body); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 10px; }
+        .sources-header { padding: 8px 15px; background: var(--bg-body); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; gap: 10px; height: 38px; }
         .sh-left { font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
-        .sh-right { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 5px 2px; }
+        .sh-right { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 1px; }
         
         .sources-container { flex: 1; overflow-y: auto; padding: 20px; }
         .sources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
@@ -153,25 +163,37 @@
         .ov-header:hover { background: var(--bg-body); color: var(--accent); }
         .ov-content { padding: 0; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.8rem; color: var(--text-muted); flex: 1; }
         .ov-sub-title { padding: 4px 12px; font-size: 0.75rem; font-weight: 700; color: var(--text-main); background: rgba(0,0,0,0.02); border-bottom: 1px solid var(--border); border-top: 1px solid var(--border); margin-top: -1px; }
-        .ov-row { padding: 3px 12px; border-bottom: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; overflow: hidden; }
-        .ov-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-        .ov-remove-btn { opacity: 0; background: none; border: none; color: var(--danger); cursor: pointer; font-weight: 700; padding: 0 0 0 8px; font-size: 0.9rem; }
-        .ov-row:hover .ov-remove-btn { opacity: 1; }
-
+        .ov-row { padding: 3px 12px; border-bottom: 1px dashed var(--border); display: flex; align-items: center; justify-content: space-between; overflow: hidden; min-height: 24px; }
+        .ov-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; pointer-events: auto; }
+        
+        .ov-row.disabled { opacity: 0.6; }
+        .ov-row.disabled .ov-val { text-decoration: line-through; color: var(--text-muted); pointer-events: none; user-select: none; }
+        
+        .ov-toggle-btn { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 50%; cursor: pointer; margin-left: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .ov-toggle-btn:hover { border-color: var(--accent); }
+        .ov-toggle-btn::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: transparent; }
+        .ov-row:not(.disabled) .ov-toggle-btn::after { background: var(--success); }
+        
+        .ov-row.disabled .ov-toggle-btn { border-color: var(--text-muted); opacity: 0.5; }
+        .ov-row.disabled .ov-toggle-btn::after { background: transparent; } 
+        
         /* Source Card */
         .source-card { 
             background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--radius); height: 45px;
             padding: 0 8px; cursor: pointer; transition: all 0.1s; user-select: none; position: relative; 
             display: flex; align-items: center; justify-content: flex-start; text-align: left;
+            overflow: hidden;
         }
         .source-card:hover { border-color: var(--accent); transform: translateY(-1px); }
         .source-card.selected { border-color: var(--accent); background: rgba(59, 130, 246, 0.05); box-shadow: 0 0 0 1px var(--accent) inset; }
-        .source-name { font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 10px 0 5px; flex: 1; }
-        .ind-lookup { position: absolute; top: 4px; right: 5px; font-size: 0.65rem; opacity: 0.8; color: var(--accent); }
-        .ind-custom { position: absolute; bottom: 3px; right: 5px; font-size: 0.65rem; opacity: 1; }
-
+        .source-name { font-size: 0.85rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 45px 0 5px; flex: 1; }
+        
+        /* Indicators */
+        .sc-indicator-lookup { position: absolute; top: 3px; right: 4px; font-size: 0.75rem; opacity: 0.7; }
+        .sc-indicator-fav { position: absolute; bottom: 3px; right: 4px; font-size: 0.75rem; color: #3b82f6; } 
+        
         /* Toolbar */
-        .toolbar { padding: 8px 15px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 55px; gap: 10px; }
+        .toolbar { padding: 0 15px; background: var(--bg-panel); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; height: 50px; gap: 10px; box-sizing: border-box; }
         .toolbar-stats { display: flex; gap: 15px; font-size: 0.8rem; color: var(--text-muted); }
         .stat-item span { color: var(--text-main); font-weight: 600; }
         .toolbar-actions { display: flex; gap: 8px; }
@@ -187,8 +209,14 @@
         .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; background: var(--bg-body); overflow-x: auto; flex-shrink: 0; }
         .modal-tab { padding: 12px 15px; cursor: pointer; font-size: 0.9rem; border-bottom: 2px solid transparent; color: var(--text-muted); white-space: nowrap; }
         .modal-tab.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
-        .modal-tab-content { padding: 20px; display: none; overflow-y: auto; }
+        .modal-tab-content { padding: 20px; display: none; overflow-y: auto; flex:1; }
         .modal-tab-content.active { display: block; }
+
+        /* Sub Tabs for Sources Manager */
+        .sub-tabs { display: flex; gap: 5px; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+        .sub-tab { padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--border); background: var(--bg-panel); color: var(--text-muted); transition: all 0.2s; white-space: nowrap; }
+        .sub-tab:hover { border-color: var(--accent); }
+        .sub-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
         
         .close-modal { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; }
 
@@ -199,19 +227,27 @@
         .inv-column-header { padding: 8px 12px; background: var(--bg-body); border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .inv-list { overflow-y: auto; flex: 1; padding: 0; }
         .inv-item { padding: 8px 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; background: var(--bg-panel); border-left: 3px solid transparent; transition: opacity 0.2s; }
-        .inv-item.disabled { opacity: 0.5; background: var(--bg-body); }
         .inv-item:hover { background: var(--bg-body); }
         .inv-item-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .inv-val { font-family: 'Consolas', monospace; font-weight: 600; color: var(--accent); font-size: 0.9rem; word-break: break-all; min-width: 0; }
         .inv-controls { display: flex; gap: 6px; align-items: center; }
-        .verdict-select { padding: 4px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.8rem; background: var(--bg-panel); color: var(--text-main); width: 110px; }
+        .verdict-select { padding: 4px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.8rem; background: var(--bg-panel); color: var(--text-main); width: 130px; }
         .note-input { flex: 1; padding: 5px 8px; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; background: var(--bg-body); color: var(--text-main); min-width: 0; }
         .note-input:focus { border-color: var(--accent); outline: none; background: var(--bg-panel); }
 
-        /* Settings Custom Sources */
-        .custom-source-list { border: 1px solid var(--border); max-height: 250px; overflow-y: auto; margin-top: 10px; border-radius: 4px; display: none; }
-        .custom-source-item { padding: 8px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
-
+        /* Settings Manage Sources */
+        .manage-sources-container { display: flex; flex-direction: column; height: 100%; }
+        .ms-list { border: 1px solid var(--border); border-radius: 4px; overflow-y: auto; flex: 1; background: var(--bg-panel); }
+        .ms-item { display: grid; grid-template-columns: 1fr 100px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        .ms-item:last-child { border-bottom: none; }
+        .ms-fav { cursor: pointer; text-align: center; color: var(--border); transition: transform 0.2s; font-size: 1.1rem; opacity: 0.5; }
+        .ms-fav:hover { transform: scale(1.2); opacity: 0.8; }
+        .ms-fav.active { color: #3b82f6; opacity: 1; }
+        .ms-tag { font-size: 0.7rem; padding: 1px 4px; border-radius: 4px; margin-left:5px; text-transform: uppercase; font-weight: 700; }
+        .tag-custom { background: var(--accent); color: white; }
+        .tag-lookup { background: var(--border); color: var(--text-muted); }
+        .ms-actions-right { display:flex; align-items:center; gap:10px; justify-content: flex-end; }
+        
         .toast { position: fixed; bottom: var(--toast-y); right: 25px; background: #333; color: white; padding: 12px 20px; border-radius: 6px; z-index: 2000; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; display: flex; align-items: center; gap: 8px; }
         .toast.visible { opacity: 1; transform: translateY(0); }
         .toast.success { background: var(--success); }
@@ -234,34 +270,68 @@
         .form-group label { display: block; margin-bottom: 4px; font-size: 0.8rem; font-weight: 600; }
         .form-input, .form-select { width: 100%; padding: 6px 8px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-panel); color: var(--text-main); box-sizing: border-box; font-size: 0.9rem; }
         .form-input:disabled { opacity: 0.5; cursor: not-allowed; background: var(--bg-body); }
+        .form-select-auto { width: auto; min-width: 120px; }
+        .form-select-sm { width: auto; min-width: 50px; }
 
-        /* Compact Grid: 0.8fr ID, 2.5fr Name, 1fr Type */
-        .add-source-grid { display: grid; grid-template-columns: 0.8fr 2.5fr 1fr; gap: 10px; }
-        .add-source-full { grid-column: 1 / -1; margin-top: -5px; } /* Pull up full width inputs */
+        .add-source-grid { display: grid; grid-template-columns: 0.5fr 1.5fr 100px; gap: 10px; }
+        .add-source-full { grid-column: 1 / -1; margin-top: -5px; } 
         .settings-subheader { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 15px 0 10px 0; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
 
-        #custom-source-header { display: none; margin-top: 20px; font-size:0.9rem; }
-        #no-sources-msg { margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
+        #report-content a { color: var(--accent); text-decoration: none; }
+        #report-content a:hover { text-decoration: underline; }
+
+        .report-controls-bar { padding: 10px 15px; background: var(--bg-body); border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.8rem; align-items: center; }
+        .report-control-item { display:flex; gap:8px; align-items:center; }
+        .report-control-label { margin:0; font-weight:500; }
+
+        .backup-container { background: var(--bg-body); color: var(--text-main); border: 1px solid var(--border); border-radius: 6px; padding: 15px; margin-top: 20px; font-size: 0.85rem; display: none; }
+        .backup-desc { margin-bottom: 10px; line-height: 1.4; color: var(--text-muted); }
+        .backup-textarea { width: 100%; height: 80px; background: var(--bg-panel); color: var(--accent); border: 1px solid var(--border); font-family: monospace; padding: 8px; margin-bottom: 10px; font-size: 0.75rem; resize: vertical; }
+
+        @media (min-width: 901px) {
+            .panel-input { height: auto !important; }
+            .add-source-grid { grid-template-columns: 0.5fr 1.5fr 100px; }
+        }
 
         @media (max-width: 900px) {
             main { flex-direction: column; }
-            .panel-input { width: 100%; height: 35%; border-right: none; border-bottom: 1px solid var(--border); }
+            .panel-input { width: 100% !important; max-width: 100%; height: 20%; min-height: 150px; max-height: 60%; border-right: none; border-bottom: 1px solid var(--border); resize: vertical; }
             .investigation-grid { grid-template-columns: 1fr; }
             .inv-column { border-right: none; border-bottom: 1px solid var(--border); }
             .inv-column:last-child { height: auto; max-height: 250px; flex: none; }
-            .toolbar { height: auto; flex-wrap: nowrap; padding: 10px; gap: 10px; }
+            .toolbar { height: auto; flex-wrap: wrap; gap: 10px; padding: 8px 15px; height: 50px; }
             .toolbar-stats { width: auto; gap: 10px; flex-shrink: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.75rem; }
             .toolbar-actions { width: auto; flex-shrink: 0; }
             .btn-fancy { min-width: 0; }
+            
+            /* Manage Sources Mobile Layout */
             .add-source-grid { grid-template-columns: 1fr; }
             .add-source-full { margin-top: 0; }
+            #add-btn-row { flex-direction: column-reverse; gap: 10px; align-items: stretch; }
+            
+            /* S20+ Optimization: Fit tabs & sources */
+            .tab { padding: 12px 8px; } /* Reduce padding to fit */
+            .tabs { justify-content: flex-start; } /* Default left */
+            /* If wrapping occurs, center it (optional, usually left is better for scrolling tabs) */
+            
+            .sources-container { padding: 15px; } /* Reduce padding */
+            .sources-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); } /* Fit 2 on 384px */
+            
+            .ms-item { grid-template-columns: 1fr 90px; }
+        }
+        
+        /* Very small screens: Hide button text */
+        @media (max-width: 400px) {
+            #sources-header .btn-fancy-text { display: none; }
+            #sources-header .btn-fancy-icon { border-right: none; width: 100%; }
+            #sources-header .btn-fancy { width: 36px; padding: 0; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="branding" id="branding-btn" title="New Investigation (Clear Notes)">
+    <div class="branding" id="branding-btn">
         <span style="font-size: 1.8rem;">🕵️‍♂️</span>
         <div>
             <div class="logo-text">TotalOSINT</div>
@@ -279,7 +349,7 @@
 
 <main>
     <!-- Left Panel: Input -->
-    <div class="panel-input">
+    <div class="panel-input" id="panel-input">
         <div class="panel-header">
             <span>Investigation Notes</span>
             <div class="header-actions">
@@ -308,7 +378,15 @@
         </div>
 
         <div class="sources-wrapper">
-            <!-- Source Toolbar -->
+            <!-- Source Toolbar (Overview) -->
+            <div class="sources-header hidden" id="overview-toolbar">
+                <div class="sh-left">Dashboard</div>
+                <div class="sh-right">
+                    <!-- Placeholder -->
+                </div>
+            </div>
+
+            <!-- Source Toolbar (Normal) -->
             <div class="sources-header hidden" id="sources-header">
                 <div class="sh-left">Select Sources</div>
                 <div class="sh-right">
@@ -324,9 +402,9 @@
                         <div class="btn-fancy-icon">🔤</div>
                         <div class="btn-fancy-text">Sort</div>
                     </button>
-                    <button class="btn-fancy btn-sm" id="add-source-header-btn">
-                        <div class="btn-fancy-icon">➕</div>
-                        <div class="btn-fancy-text">Add</div>
+                    <button class="btn-fancy btn-sm" id="manage-sources-btn" title="Manage Sources">
+                        <div class="btn-fancy-icon">⚙️</div>
+                        <div class="btn-fancy-text">Manage</div>
                     </button>
                 </div>
             </div>
@@ -384,17 +462,22 @@
                         <span id="inv-source-count-display">Target Sources (0)</span>
                     </div>
                     <div class="inv-list" id="inv-source-list" style="padding: 10px; max-height: 200px;"></div>
-                    <div style="padding: 15px; display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border); background:var(--bg-panel); flex:none;">
+                    
+                    <!-- Bottom Controls -->
+                    <div style="padding: 15px; display:flex; flex-direction:column; gap:10px; border-top:1px solid var(--border); background:var(--bg-panel); flex:none; margin-top: auto;">
                         <button class="btn-fancy btn-primary" id="execute-btn">
                             <div class="btn-fancy-icon">🌐</div>
                             <div class="btn-fancy-text">Open All Sources</div>
                         </button>
-                        <hr style="width:100%; border:0; border-top:1px solid var(--border); margin:5px 0;">
-                        <button class="btn-fancy" id="generate-report-btn">
-                            <div class="btn-fancy-icon">📋</div>
-                            <div class="btn-fancy-text">Copy Report</div>
-                        </button>
-                        <div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Includes Verdicts & Notes</div>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn-fancy" id="preview-report-btn" style="flex:1;">
+                                <div class="btn-fancy-icon">📜</div>
+                                <div class="btn-fancy-text">Report</div>
+                            </button>
+                            <button class="btn-fancy btn-square" id="generate-report-btn" title="Copy Report">
+                                <div class="btn-fancy-icon" style="width:100%; border:none;">📋</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -402,15 +485,50 @@
     </div>
 </div>
 
-<!-- Preview Modal -->
+<!-- Report Modal -->
 <div class="modal-overlay" id="preview-modal" style="z-index: 1100;">
-    <div class="modal" style="max-width: 500px; max-height: 60vh;">
+    <div class="modal" style="max-width: 650px; height: 600px; position: relative;">
         <div class="modal-header">
-            <h2 id="preview-title" style="font-size: 0.95rem; word-break: break-all;">Sources</h2>
-            <button class="icon-btn close-modal" onclick="document.getElementById('preview-modal').classList.remove('open')" style="color:var(--text-main);">×</button>
+            <h2 id="preview-title">Report</h2>
+            <button class="icon-btn close-modal" style="color:var(--text-main);">×</button>
         </div>
-        <div class="modal-body" style="padding: 0;">
-            <div id="preview-list" style="padding: 10px;"></div>
+        
+        <!-- Report Settings Header -->
+        <div class="report-controls-bar">
+             <div class="report-control-item">
+                <span class="report-control-label">Defang</span>
+                <label class="toggle-switch"> <input type="checkbox" id="preview-defang"> <span class="toggle-slider"></span> </label>
+             </div>
+             <div class="report-control-item">
+                <span class="report-control-label">Refs</span>
+                <label class="toggle-switch"> <input type="checkbox" id="preview-reference"> <span class="toggle-slider"></span> </label>
+             </div>
+             <div class="report-control-item">
+                <span class="report-control-label">Space</span>
+                <label class="toggle-switch"> <input type="checkbox" id="preview-addspace"> <span class="toggle-slider"></span> </label>
+             </div>
+             <div class="report-control-item" style="margin-left:auto;">
+                <select class="form-select form-select-auto" id="preview-sep-type" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
+                    <option value="newline">Newline</option>
+                    <option value="dash">Hyphen (-)</option>
+                    <option value="eq">Equal (=)</option>
+                    <option value="us">Underscore (_)</option>
+                    <option value="comma">Comma</option>
+                </select>
+                <select class="form-select form-select-sm" id="preview-sep-len" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
+                    <option value="3">3</option>
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="75">75</option>
+                </select>
+             </div>
+        </div>
+
+        <div class="modal-body" style="padding: 0; background: var(--bg-panel);">
+             <div id="report-content" style="width:100%; height:100%; padding:20px; font-family:'Consolas', monospace; outline:none; overflow:auto; white-space: pre-wrap; font-size: 0.9rem; line-height: 1.5; word-break: break-all;"></div>
+             <button class="btn-floating" id="preview-copy-btn" title="Copy to Clipboard">📋</button>
         </div>
     </div>
 </div>
@@ -424,8 +542,8 @@
         </div>
         <div class="modal-tabs">
             <div class="modal-tab active" data-tab="appearance">Appearance</div>
-            <div class="modal-tab" data-tab="security">Security & Output</div>
-            <div class="modal-tab" data-tab="sources">Custom Sources</div>
+            <div class="modal-tab" data-tab="security">Security</div>
+            <div class="modal-tab" data-tab="sources">Manage Sources</div>
         </div>
 
         <div class="modal-body">
@@ -451,72 +569,105 @@
                     <label>Global De-fang</label>
                     <div class="flex-gap">
                         <label class="toggle-switch"> <input type="checkbox" id="setting-defang"> <span class="toggle-slider"></span> </label>
-                        <span style="font-size:0.85rem; color:var(--text-muted);">Replace <code>.</code> with <code>[.]</code></span>
+                        <span style="font-size:0.85rem; color:var(--text-muted);">Replace <code>.</code> with <code>[.]</code>, <code>http</code> with <code>hxxp</code>, etc.</span>
                     </div>
-                </div>
-                
-                <div class="settings-subheader" style="margin-top:30px;">Output</div>
-                <div class="form-group">
-                    <label>Reference URLs in Report</label>
-                    <div class="flex-gap">
-                        <label class="toggle-switch"> <input type="checkbox" id="setting-reference"> <span class="toggle-slider"></span> </label>
-                        <span style="font-size:0.85rem; color:var(--text-muted);">Include list of lookup URLs</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Report Separator</label>
-                    <select class="form-select" id="setting-separator">
-                        <option value="newline">Double Newline (Standard)</option>
-                        <option value="single">Single Newline (Compact)</option>
-                        <option value="dash">Dashes (---)</option>
-                        <option value="comma">Comma Separated</option>
-                    </select>
                 </div>
             </div>
 
-            <!-- Custom Sources Tab -->
+            <!-- Manage Sources Tab -->
             <div id="tab-sources" class="modal-tab-content">
-                <div style="background: var(--bg-body); padding: 10px; border-radius: 6px; border: 1px solid var(--border);">
-                    <div class="add-source-grid">
-                        <div class="form-group">
-                            <label>ID <span class="text-danger">*</span></label>
-                            <input type="text" class="form-input" id="cs-id" placeholder="MY_TOOL" style="text-transform: uppercase;">
+                <div class="manage-sources-container">
+                    <!-- Form Container (Hidden by default) -->
+                    <div id="add-source-form-container" style="background: var(--bg-body); padding: 10px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 15px; display:none;">
+                        <div class="add-source-grid">
+                            <div class="form-group">
+                                <label>ID <span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" id="cs-id" placeholder="ID" style="text-transform: uppercase;">
+                            </div>
+                            <div class="form-group">
+                                <label>Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" id="cs-name" placeholder="Tool Name">
+                            </div>
+                             <div class="form-group">
+                                <label>Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="cs-type" style="width: 100%;">
+                                    <option value="ip">IP</option>
+                                    <option value="domain">Domain</option>
+                                    <option value="hash">Hash</option>
+                                    <option value="bookmarks">Bookmark</option>
+                                </select>
+                            </div>
+                            <div class="form-group add-source-full">
+                                <label>Home URL <span class="text-danger">*</span></label>
+                                <input type="text" class="form-input" id="cs-home" placeholder="https://tool.com">
+                            </div>
+                            <div class="form-group add-source-full">
+                                <label>Lookup URL (Optional)</label>
+                                <input type="text" class="form-input" id="cs-lookup" placeholder="https://tool.com/search?q=">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-input" id="cs-name" placeholder="My Tool">
-                        </div>
-                        <div class="form-group">
-                            <label>Type <span class="text-danger">*</span></label>
-                            <select class="form-select" id="cs-type">
-                                <option value="ip">IP</option>
-                                <option value="domain">Domain</option>
-                                <option value="hash">Hash</option>
-                                <option value="bookmarks">Bookmark</option>
-                            </select>
-                        </div>
-                        <div class="form-group add-source-full">
-                            <label>Home URL <span class="text-danger">*</span></label>
-                            <input type="text" class="form-input" id="cs-home" placeholder="https://tool.com">
-                        </div>
-                        <div class="form-group add-source-full">
-                            <label>Lookup URL (Optional)</label>
-                            <input type="text" class="form-input" id="cs-lookup" placeholder="https://tool.com/search?q=">
+                        <div style="display:flex; gap:10px; margin-top:5px; justify-content: space-between;">
+                            <div style="display:flex; gap:10px;">
+                                <button class="btn-fancy btn-success" id="save-custom-source-btn" style="height:32px;">
+                                    <div class="btn-fancy-icon">💾</div>
+                                    <div class="btn-fancy-text" id="add-source-text">Save Source</div>
+                                </button>
+                                <button class="btn-fancy" id="cancel-edit-btn" style="height:32px; width:80px; flex:none;">
+                                    <div class="btn-fancy-text">Cancel</div>
+                                </button>
+                            </div>
+                            <button class="btn-fancy btn-danger hidden" id="delete-custom-source-btn" style="height:32px; width:40px; justify-content:center;">
+                                <div style="font-size:1.2rem;">🗑️</div>
+                            </button>
                         </div>
                     </div>
-                    <div style="display:flex; gap:10px; margin-top:5px;">
-                        <button class="btn-fancy" id="add-custom-source-btn" style="height:32px;">
+
+                    <!-- Actions -->
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;" id="add-btn-row">
+                        <div class="sub-tabs" style="margin:0; border:none; padding:0;">
+                            <div class="sub-tab active" onclick="filterManageSources('all')">All</div>
+                            <div class="sub-tab" onclick="filterManageSources('ip')">IP</div>
+                            <div class="sub-tab" onclick="filterManageSources('domain')">Domain/URL</div>
+                            <div class="sub-tab" onclick="filterManageSources('hash')">Hash</div>
+                            <div class="sub-tab" onclick="filterManageSources('bookmarks')">Bookmarks</div>
+                        </div>
+                        <button class="btn-fancy btn-sm" id="show-add-form-btn">
                             <div class="btn-fancy-icon">➕</div>
-                            <div class="btn-fancy-text" id="add-source-text">Add Source</div>
+                            <div class="btn-fancy-text">Add Source</div>
                         </button>
-                        <button class="btn-fancy hidden" id="cancel-edit-btn" style="height:32px; width:100px; flex:none;">
-                            <div class="btn-fancy-text">Cancel</div>
-                        </button>
+                    </div>
+                    
+                    <!-- List -->
+                    <div class="ms-list" id="manage-sources-list"></div>
+
+                    <!-- Backup UI Link -->
+                    <div style="text-align: right; margin-top: 10px;">
+                        <a href="#" id="backup-toggle-link" onclick="openBackupUI()" style="font-size:0.75rem; color:var(--text-muted); text-decoration:none;">Advanced / Backup</a>
+                    </div>
+                    
+                    <!-- Backup UI (Hidden) -->
+                    <div id="backup-ui" class="backup-container">
+                        <div style="font-weight:700; margin-bottom:5px;">Backup & Restore</div>
+                        <div class="backup-desc">
+                            Save your custom sources and favorites to a local text file. <br>
+                            If you ever lose your local storage, you can use this to restore.
+                        </div>
+                        <textarea id="backup-text" class="backup-textarea" placeholder="Paste JSON here to restore..."></textarea>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-fancy btn-sm" id="btn-do-backup-copy">
+                                <div class="btn-fancy-icon">📋</div>
+                                <div class="btn-fancy-text">Copy</div>
+                            </button>
+                            <button class="btn-fancy btn-sm btn-primary" id="btn-do-restore">
+                                <div class="btn-fancy-icon">🔄</div>
+                                <div class="btn-fancy-text">Restore</div>
+                            </button>
+                            <button class="btn-fancy btn-sm" onclick="closeBackupUI()">
+                                <div class="btn-fancy-text">Cancel</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
-                <h4 id="custom-source-header">Your Custom Sources</h4>
-                <div id="no-sources-msg">No custom sources added.</div>
-                <div class="custom-source-list" id="custom-source-list"></div>
             </div>
         </div>
     </div>
@@ -543,13 +694,16 @@
         data: { ip: [], domain: [], hash: [] },
         selectedSources: { ip: [], domain: [], hash: [], bookmarks: [] },
         currentTab: 'overview',
+        manageFilter: 'all',
         customSources: [],
+        favorites: [],
         verdicts: {},
         disabledEntities: {}, 
         sortDesc: false, 
-        settings: { theme: 'dark', defang: true, separator: 'newline', showReference: true },
+        settings: { theme: 'dark', defang: true, sepType: 'newline', sepLen: '3', addSpace: false, showReference: true },
         debounceTimer: null,
-        editingId: null
+        editingId: null,
+        tempReport: ''
     };
 
     /* --- DOM ELEMENTS --- */
@@ -558,6 +712,7 @@
         backdrop: document.getElementById('input-backdrop'),
         grid: document.getElementById('sources-grid'),
         sourcesHeader: document.getElementById('sources-header'),
+        ovHeader: document.getElementById('overview-toolbar'),
         dashboard: document.getElementById('overview-dashboard'),
         msg: document.getElementById('no-data-msg'),
         tabs: document.querySelectorAll('.tab'),
@@ -574,7 +729,7 @@
         loadSettings();
         mergeSources();
         setupEvents();
-        els.input.value = ''; // Clean start
+        els.input.value = ''; 
         els.input.focus();
         renderOverview(); 
         switchTab('overview');
@@ -584,14 +739,30 @@
         const s = localStorage.getItem('totalosint_settings');
         if(s) app.settings = {...app.settings, ...JSON.parse(s)};
         setTheme(app.settings.theme);
-        document.getElementById('setting-defang').checked = app.settings.defang;
-        document.getElementById('modal-defang').checked = app.settings.defang;
-        document.getElementById('setting-reference').checked = app.settings.showReference;
-        document.getElementById('setting-separator').value = app.settings.separator;
+        
+        syncSettingsUI();
+
         const cs = localStorage.getItem('totalosint_custom_sources');
         if(cs) app.customSources = JSON.parse(cs);
+
+        const fav = localStorage.getItem('totalosint_favorites');
+        if(fav) app.favorites = JSON.parse(fav);
     }
+
+    function syncSettingsUI() {
+        document.getElementById('setting-defang').checked = app.settings.defang;
+        document.getElementById('modal-defang').checked = app.settings.defang;
+        document.getElementById('preview-defang').checked = app.settings.defang;
+        document.getElementById('preview-reference').checked = app.settings.showReference;
+        document.getElementById('preview-sep-type').value = app.settings.sepType;
+        document.getElementById('preview-sep-len').value = app.settings.sepLen;
+        document.getElementById('preview-addspace').checked = app.settings.addSpace;
+        
+        toggleReportDropdown();
+    }
+
     function saveSettings() { localStorage.setItem('totalosint_settings', JSON.stringify(app.settings)); }
+    function saveFavorites() { localStorage.setItem('totalosint_favorites', JSON.stringify(app.favorites)); }
     
     function setTheme(theme) {
         app.settings.theme = theme;
@@ -618,7 +789,7 @@
     
     function softReset() {
         clearNotes();
-        // Keep selected sources, clear data only
+        closeSourceForm();
         app.data = { ip: [], domain: [], hash: [] };
         app.verdicts = {};
         app.disabledEntities = {};
@@ -628,17 +799,26 @@
 
     /* --- ANALYSIS --- */
     const R = {
-        url: /https?:\/\/[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}(?:\/[^\s<>"']*)?/g,
-        ipv6: /((?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?|::(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4})*)?)/g,
-        ipv4: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
-        hash: /\b[a-fA-F0-9]{32}\b|\b[a-fA-F0-9]{40}\b|\b[a-fA-F0-9]{64}\b/g,
-        domain: /(?<![\w@\.\-\/])\b([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}\b/gi,
+        ipv4: /\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\.|\[\.\]|\(\.\))){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/g,
+        ipv6: /((?:[0-9a-fA-F]{1,4}(?::|\[:\])){7}[0-9a-fA-F]{1,4}|(?:[0-9a-fA-F]{1,4}(?::|\[:\])){1,7}(?::|\[:\])(?:[0-9a-fA-F]{1,4}(?:(?::|\[:\])[0-9a-fA-F]{1,4})*)?|::(?:[0-9a-fA-F]{1,4}(?:(?::|\[:\])[0-9a-fA-F]{1,4})*)?)/g,
+        url: /h(?:tt|xx)ps?(?::|\[:\])\/\/(?:[a-zA-Z0-9.\-]|\[\.\]|\(\.\))+\.(?:[a-zA-Z]{2,}|\[\.\][a-zA-Z]{2,}|\(\.\)[a-zA-Z]{2,})(?:\/[^\s<>"']*)?/g,
+        domain: /(?<![\w@\.\-\/])\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.|\[\.\]|\(\.\)))+[a-z]{2,63}\b/gi,
+        hash: /\b[a-fA-F0-9]{32}\b|\b[a-fA-F0-9]{40}\b|\b[a-fA-F0-9]{64}\b/g
     };
 
     function onInputChanged() {
         clearTimeout(app.debounceTimer);
         generateHighlights(); 
         app.debounceTimer = setTimeout(analyzeInput, 600);
+    }
+
+    function cleanInput(val) {
+        if(!val) return val;
+        let s = val.replace(/\[\.\]/g, '.').replace(/\(\.\)/g, '.');
+        s = s.replace(/\[:\]/g, ':');
+        s = s.replace(/hxxp/gi, 'http');
+        s = s.replace(/\[\:\/\/\]/g, '://');
+        return s;
     }
 
     function analyzeInput() {
@@ -662,19 +842,21 @@
 
         const urlSet = new Set(rawURLs);
         urlSet.forEach(u => {
-            app.data.domain.push({ val: u, type: 'URL' });
+            const cleanU = cleanInput(u);
+            app.data.domain.push({ val: cleanU, type: 'URL' });
             try {
-                const urlObj = new URL(u.startsWith('http') ? u : 'http://' + u); 
-                if (urlObj.hostname && urlObj.hostname.includes('.')) app.data.domain.push({ val: urlObj.hostname, type: 'Domain' });
+                const urlObj = new URL(cleanU.startsWith('http') ? cleanU : 'http://' + cleanU); 
+                if (urlObj.hostname && urlObj.hostname.includes('.')) app.data.domain.push({ val: urlObj.hostname, type: 'Domain' }); 
             } catch(e) {}
         });
 
         [...new Set(rawDomains)].forEach(d => {
-            if(!d.match(/^\d+\.\d+\.\d+\.\d+$/)) app.data.domain.push({ val: d, type: 'Domain' });
+             const cleanD = cleanInput(d);
+             if(!cleanD.match(/^\d+\.\d+\.\d+\.\d+$/)) app.data.domain.push({ val: cleanD, type: 'Domain' });
         });
 
-        [...new Set(rawIPv6s)].forEach(ip => app.data.ip.push({ val: ip, type: 'IPv6' }));
-        [...new Set(rawIPv4s)].forEach(ip => app.data.ip.push({ val: ip, type: 'IPv4' }));
+        [...new Set(rawIPv6s)].forEach(ip => app.data.ip.push({ val: cleanInput(ip), type: 'IPv6' }));
+        [...new Set(rawIPv4s)].forEach(ip => app.data.ip.push({ val: cleanInput(ip), type: 'IPv4' }));
         
         [...new Set(rawHashes)].forEach(h => {
             let t = 'Hash';
@@ -699,6 +881,18 @@
         generateHighlights(); 
     }
 
+    function applyDefang(val) {
+        if(!app.settings.defang) return val;
+        let s = val;
+        s = s.replace(/http/gi, 'hxxp');
+        s = s.replace(/:\/\//g, '___SCHEME___');
+        if (s.includes('.')) s = s.replace(/\./g, '[.]');
+        if (s.includes(':')) s = s.replace(/:/g, '[:]'); 
+        s = s.replace(/___SCHEME___/g, '[://]');
+        s = s.replace(/\[\[\.\]\]/g, '[.]');
+        return s;
+    }
+
     function removeDuplicates(arr) {
         const unique = new Set();
         return arr.filter(item => {
@@ -710,14 +904,18 @@
     }
 
     function updateCounts() {
-        els.counts.ip.innerText = app.data.ip.length;
-        els.counts.domain.innerText = app.data.domain.length;
-        els.counts.hash.innerText = app.data.hash.length;
+        const filter = (arr) => arr.filter(x => !app.disabledEntities[x.val]).length;
+        els.counts.ip.innerText = filter(app.data.ip);
+        els.counts.domain.innerText = filter(app.data.domain);
+        els.counts.hash.innerText = filter(app.data.hash);
+        const total = filter(app.data.ip) + filter(app.data.domain) + filter(app.data.hash);
+        els.stats.ent.innerText = total;
     }
 
     function renderOverview() {
         const dash = els.dashboard;
         dash.innerHTML = '';
+        
         const totalItems = app.data.ip.length + app.data.domain.length + app.data.hash.length;
 
         if(totalItems === 0) {
@@ -734,7 +932,7 @@
         ['ip','domain','hash'].forEach(key => {
              const items = app.data[key];
              if(items.length === 0) return;
-             
+             const activeCount = items.filter(x => !app.disabledEntities[x.val]).length;
              const subgroups = {};
              items.forEach(i => {
                 if(!subgroups[i.type]) subgroups[i.type] = [];
@@ -743,7 +941,7 @@
 
              const card = document.createElement('div');
              card.className = 'ov-card';
-             card.innerHTML = `<div class="ov-header" onclick="switchTab('${key}')"><span>${key === 'ip' ? 'IP Address' : key === 'domain' ? 'Domain / URL' : 'File Hash'}</span> <span>${items.length} ➔</span></div>`;
+             card.innerHTML = `<div class="ov-header" onclick="switchTab('${key}')"><span>${key === 'ip' ? 'IP Address' : key === 'domain' ? 'Domain / URL' : 'File Hash'}</span> <span>${activeCount} ➔</span></div>`;
              
              const content = document.createElement('div');
              content.className = 'ov-content';
@@ -751,10 +949,16 @@
              Object.keys(subgroups).sort().forEach(subKey => {
                 content.innerHTML += `<div class="ov-sub-title">${subKey}</div>`;
                 subgroups[subKey].forEach(val => {
+                    const isDisabled = app.disabledEntities[val];
                     const row = document.createElement('div');
-                    row.className = 'ov-row';
-                    const safeVal = val.replace(/"/g, '&quot;');
-                    row.innerHTML = `<span class="ov-val" title="${safeVal}">${safeVal}</span>`;
+                    row.className = `ov-row ${isDisabled ? 'disabled' : ''}`;
+                    const displayVal = applyDefang(val);
+                    const safeVal = displayVal.replace(/"/g, '&quot;');
+                    
+                    row.innerHTML = `
+                        <span class="ov-val" title="${safeVal}">${safeVal}</span>
+                        <div class="ov-toggle-btn" onclick="toggleEntityDisable('${val.replace(/'/g, "\\'")}')" title="${isDisabled ? 'Enable' : 'Disable'}"></div>
+                    `;
                     content.appendChild(row);
                 });
              });
@@ -763,11 +967,25 @@
         });
     }
 
+    window.toggleEntityDisable = (ent) => {
+        app.disabledEntities[ent] = !app.disabledEntities[ent];
+        updateCounts(); 
+        renderOverview(); 
+        generateHighlights(); 
+        updateUI();
+    };
+
     function generateHighlights() {
         let text = els.input.value;
         if(!text) { els.backdrop.innerHTML = ''; return; }
         text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        const wrap = (t, rx, cls) => t.replace(rx, m => `<mark class="${cls}">${m}</mark>`);
+        
+        const wrap = (t, rx, cls) => t.replace(rx, m => {
+            let clean = cleanInput(m);
+            if(app.disabledEntities[clean]) return m; 
+            return `<mark class="${cls}">${m}</mark>`;
+        });
+        
         text = wrap(text, R.hash, 'type-hash');
         text = wrap(text, R.url, 'type-domain'); 
         text = wrap(text, R.domain, 'type-domain'); 
@@ -787,6 +1005,7 @@
         els.dashboard.classList.toggle('hidden', !isOverview);
         els.grid.classList.toggle('hidden', isOverview);
         els.sourcesHeader.classList.toggle('hidden', isOverview);
+        els.ovHeader.classList.toggle('hidden', !isOverview);
         els.backdrop.className = `input-backdrop mode-${type}`;
 
         if (type === 'overview') {
@@ -803,9 +1022,9 @@
             els.launchBtns.modal.classList.remove('hidden');
             els.launchBtns.direct.title = "Open All Sources"; 
             renderSources();
-            const count = app.data[type]?.length || 0;
+            const count = app.data[type]?.filter(x => !app.disabledEntities[x.val]).length || 0;
             els.msg.style.display = (count === 0) ? 'block' : 'none';
-            els.msg.innerHTML = `<i>No entities detected for this category.</i>`;
+            els.msg.innerHTML = `<i>No active entities.</i>`;
         }
 
         updateUI();
@@ -818,16 +1037,16 @@
         els.grid.innerHTML = '';
         list.forEach(src => {
             const isSel = app.selectedSources[app.currentTab].includes(src.id);
-            const isCustom = app.customSources.find(c => c.id === src.id);
+            const isFav = app.favorites.includes(src.id);
             
             const el = document.createElement('div');
             el.className = `source-card ${isSel ? 'selected' : ''}`;
             el.title = src.name; 
             
             let html = `<span class="source-name">${src.name}</span>`;
-            if(src.lookupurl) html += `<span class="ind-lookup">🔍</span>`;
-            if(isCustom) html += `<span class="ind-custom">✨</span>`;
-            
+            if(src.lookupurl) html += `<div class="sc-indicator-lookup">🔍</div>`;
+            if(isFav) html += `<div class="sc-indicator-fav">💙</div>`;
+
             el.innerHTML = html;
             el.onclick = () => toggleSource(src.id);
             els.grid.appendChild(el);
@@ -846,10 +1065,12 @@
     function updateUI() {
         const tab = app.currentTab;
         const srcCount = app.selectedSources[tab]?.length || 0;
-        const entCount = (tab === 'bookmarks') ? 0 : app.data[tab]?.length || 0;
-        const totalEnt = app.data.ip.length + app.data.domain.length + app.data.hash.length;
+        const activeTotal = (app.data.ip.filter(x=>!app.disabledEntities[x.val]).length) + 
+                          (app.data.domain.filter(x=>!app.disabledEntities[x.val]).length) + 
+                          (app.data.hash.filter(x=>!app.disabledEntities[x.val]).length);
+        const entCount = (tab === 'bookmarks' || tab === 'overview') ? activeTotal : app.data[tab]?.filter(x => !app.disabledEntities[x.val]).length || 0;
 
-        els.stats.ent.innerText = tab === 'overview' ? totalEnt : entCount;
+        els.stats.ent.innerText = entCount;
         els.stats.src.innerText = srcCount;
         
         const showStats = tab !== 'overview' && tab !== 'bookmarks';
@@ -866,7 +1087,7 @@
         const sourceIds = app.selectedSources[tab];
         if (sourceIds.length === 0) return toast("Select at least one source.", "error");
         
-        let entities = app.data[tab];
+        let entities = app.data[tab].filter(e => !app.disabledEntities[e.val]);
         
         if(entities.length === 0) {
             document.getElementById('inv-entity-count').innerText = 0;
@@ -880,25 +1101,23 @@
                 const ent = entObj.val;
                 if(!app.verdicts[ent]) app.verdicts[ent] = { status: 'Untriaged', note: '' };
                 const v = app.verdicts[ent];
-                const displayEnt = app.settings.defang ? ent.replace(/\./g, '[.]') : ent;
-                const isDisabled = !!app.disabledEntities[ent];
-
+                const displayEnt = applyDefang(ent);
+                
                 const div = document.createElement('div');
-                div.className = `inv-item ${isDisabled ? 'disabled' : ''}`;
-                div.dataset.val = ent;
+                div.className = `inv-item`;
                 div.innerHTML = `
                     <div class="inv-item-header">
                         <span class="inv-val" title="${ent}">${displayEnt}</span>
                         <div class="flex-gap" style="gap:5px;">
-                            <button class="icon-btn" title="Preview" style="font-size:0.9rem;" onclick="previewSources('${ent}')">📜</button>
-                            <button class="icon-btn" title="Copy" style="font-size:0.9rem;" onclick="copyToClip('${displayEnt}', true)">📋</button>
-                            <button class="icon-btn" title="${isDisabled ? 'Enable' : 'Disable'}" style="font-size:0.9rem; opacity:${isDisabled?1:0.6}" onclick="toggleEntityDisable('${ent}')">${isDisabled ? '👁️' : '🚫'}</button>
+                            <button class="icon-btn" title="Copy" style="font-size:0.9rem;" onclick="copyToClip('${displayEnt}', 'Copied!')">📋</button>
                         </div>
                     </div>
                     <div class="inv-controls">
                         <select class="verdict-select" onchange="updateVerdict('${ent}', 'status', this.value)">
                             <option value="Untriaged" ${v.status === 'Untriaged'?'selected':''}>Untriaged</option>
-                            <option value="Safe" ${v.status === 'Safe'?'selected':''}>✅ Safe</option>
+                            <option value="Unknown" ${v.status === 'Unknown'?'selected':''}>❓ Unknown</option>
+                            <option value="Clean" ${v.status === 'Clean'?'selected':''}>✅ Clean</option>
+                            <option value="Low-Suspicion" ${v.status === 'Low-Suspicion'?'selected':''}>🟡 Low-Suspicion</option>
                             <option value="Suspicious" ${v.status === 'Suspicious'?'selected':''}>⚠️ Suspicious</option>
                             <option value="Malicious" ${v.status === 'Malicious'?'selected':''}>⛔ Malicious</option>
                         </select>
@@ -920,35 +1139,6 @@
         els.modals.inv.classList.add('open');
     }
 
-    window.toggleEntityDisable = (ent) => {
-        app.disabledEntities[ent] = !app.disabledEntities[ent];
-        const item = document.querySelector(`.inv-item[data-val="${ent}"]`);
-        if(item) {
-            item.classList.toggle('disabled', app.disabledEntities[ent]);
-            const btn = item.querySelector('button[title="Disable"], button[title="Enable"]');
-            if(btn) {
-                 btn.title = app.disabledEntities[ent] ? "Enable" : "Disable";
-                 btn.innerHTML = app.disabledEntities[ent] ? "👁️" : "🚫";
-                 btn.style.opacity = app.disabledEntities[ent] ? "1" : "0.6";
-            }
-        }
-    };
-
-    window.previewSources = (ent) => {
-        const tab = app.currentTab;
-        const sourceIds = app.selectedSources[tab];
-        const activeSrc = window.sources[tab].filter(s => sourceIds.includes(s.id));
-        const list = document.getElementById('preview-list');
-        list.innerHTML = '';
-        document.getElementById('preview-title').innerText = ent;
-        activeSrc.forEach(src => {
-             let url = src.url;
-             if(ent && src.lookupurl) url = src.lookupurl + encodeURIComponent(ent);
-             list.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid var(--border);"><span style="font-size:0.85rem;">${src.name}</span><a href="${url}" target="_blank" class="btn-fancy btn-sm" style="flex:0 0 auto; width:auto; text-decoration:none; padding:0 8px; display:flex;">Open ↗</a></div>`;
-        });
-        els.modals.preview.classList.add('open');
-    };
-
     function executeInvestigation() {
         const tab = app.currentTab;
         const sourceIds = app.selectedSources[tab];
@@ -962,18 +1152,16 @@
             return;
         }
 
-        // Logic for running without entities (Use Home URL)
         let entities = app.data[tab].filter(e => !app.disabledEntities[e.val]);
-        if(entities.length === 0) entities = [{val: ''}]; // Dummy empty entity to trigger loop
+        if(entities.length === 0) entities = [{val: ''}];
 
         if(sourceIds.length === 0) return toast("Select sources first.", "error");
 
         let urls = [];
         entities.forEach(obj => {
-            const ent = obj.val;
+            const ent = obj.val; // Raw data
             window.sources[tab].filter(s => sourceIds.includes(s.id)).forEach(src => {
-                let target = src.url; // Default to home URL
-                // Only use lookup if entity exists and source has lookup
+                let target = src.url;
                 if (ent && ent !== '' && src.lookupurl) {
                     target = src.lookupurl + encodeURIComponent(ent);
                 }
@@ -986,38 +1174,87 @@
         urls.forEach(u => window.open(u, '_blank'));
     }
 
-    function generateReport() {
+    function getSeparator() {
+        const type = app.settings.sepType;
+        const len = parseInt(app.settings.sepLen) || 3;
+        const charMap = { 'dash': '-', 'eq': '=', 'us': '_' };
+        let char = charMap[type];
+
+        if(type === 'newline') return app.settings.addSpace ? '\n\n\n\n' : '\n\n';
+        if(type === 'comma') return app.settings.addSpace ? '\n\n,\n\n' : '\n,\n'; 
+
+        let line = char.repeat(len);
+        if(app.settings.addSpace) return `\n\n${line}\n\n`;
+        return `\n${line}\n`;
+    }
+
+    function buildReportText(forHtml = false) {
         const entities = app.data[app.currentTab].filter(e => !app.disabledEntities[e.val]);
-        if(entities.length === 0) return toast("No entities to report.", "warning");
+        if(entities.length === 0) return null;
 
         let report = "";
-        const sepMap = { 'newline': '\n\n', 'single': '\n', 'dash': '\n---\n', 'comma': ', ' };
-        const sep = sepMap[app.settings.separator] || '\n\n';
+        const sep = getSeparator();
+
         const sourceIds = app.selectedSources[app.currentTab];
         const activeSources = window.sources[app.currentTab].filter(s => sourceIds.includes(s.id));
+        const showRefs = app.settings.showReference && activeSources.length > 0;
 
         entities.forEach((obj, i) => {
             const ent = obj.val;
             const v = app.verdicts[ent] || { status: 'Untriaged', note: '' };
-            const displayEnt = app.settings.defang ? ent.replace(/\./g, '[.]').replace(/http/gi, 'hxxp') : ent;
+            const displayEnt = applyDefang(ent);
             
             report += `${obj.type}: ${displayEnt}\n`;
             report += `Verdict: ${v.status}\n`;
             if(v.note) report += `Note: ${v.note}\n`;
-            if(app.settings.showReference && activeSources.length > 0) {
-                report += `References:\n`;
-                activeSources.forEach(src => {
-                     let url = src.url;
-                     if(ent && src.lookupurl) url = src.lookupurl + encodeURIComponent(ent);
-                     report += `${url}\n`;
-                });
+            
+            if(showRefs) {
+                if(activeSources.length === 1) {
+                    let url = activeSources[0].url;
+                    if(ent && activeSources[0].lookupurl) url = activeSources[0].lookupurl + encodeURIComponent(ent);
+                    if(forHtml) report += `References: ###LINK###${url}###LINK###`;
+                    else report += `References: ${url}`;
+                } else {
+                    report += `References:`;
+                    activeSources.forEach(src => {
+                        let url = src.url;
+                        if(ent && src.lookupurl) url = src.lookupurl + encodeURIComponent(ent);
+                        if(forHtml) report += `\n###LINK###${url}###LINK###`;
+                        else report += `\n${url}`;
+                    });
+                }
+            } else {
+                report = report.trimEnd();
             }
+            
             if(i < entities.length - 1) report += sep;
         });
-        copyToClip(report);
+        return report;
     }
 
-    /* --- HELPERS --- */
+    function generateReport() {
+        const report = buildReportText(false);
+        if(!report) return toast("No entities to report.", "warning");
+        copyToClip(report);
+    }
+    
+    function previewReport() {
+        refreshPreview();
+        els.modals.preview.classList.add('open');
+    }
+
+    function refreshPreview() {
+        const report = buildReportText(true);
+        if(!report) {
+            document.getElementById('report-content').innerHTML = "No entities to report.";
+            return;
+        }
+        const escaped = report.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        const linked = escaped.replace(/###LINK###(.*?)###LINK###/g, '<a href="$1" target="_blank">$1</a>');
+        document.getElementById('report-content').innerHTML = linked;
+        app.tempReport = buildReportText(false); 
+    }
+
     window.updateVerdict = (ent, key, val) => {
         if(!app.verdicts[ent]) app.verdicts[ent] = { status: 'Untriaged', note: '' };
         app.verdicts[ent][key] = val;
@@ -1032,11 +1269,197 @@
         setTimeout(() => t.classList.remove('visible'), 3000);
     }
 
+    window.filterManageSources = (cat) => {
+        app.manageFilter = cat;
+        document.querySelectorAll('.sub-tab').forEach(t => {
+            if(t.innerText.toLowerCase() === cat || (cat==='all' && t.innerText==='All')) t.classList.add('active');
+            else t.classList.remove('active');
+        });
+        renderManageSources();
+    };
+
+    function renderManageSources() {
+        const list = document.getElementById('manage-sources-list');
+        list.innerHTML = '';
+        let all = [];
+        ['ip','domain','hash','bookmarks'].forEach(t => {
+            if(window.sources[t]) {
+                window.sources[t].forEach(s => {
+                    if(!all.find(x => x.id === s.id && x._cat === t)) all.push({...s, _cat: t});
+                });
+            }
+        });
+        if(app.manageFilter !== 'all') {
+            all = all.filter(x => x._cat === app.manageFilter);
+        }
+        all.forEach(s => {
+            const isFav = app.favorites.includes(s.id);
+            const isCustom = app.customSources.find(c => c.id === s.id);
+            const div = document.createElement('div');
+            div.className = 'ms-item';
+            let tags = '';
+            if(isCustom) tags += `<span class="ms-tag tag-custom">Custom</span>`;
+            if(s.lookupurl) tags += `<span class="ms-tag tag-lookup">Lookup</span>`;
+            let displayUrl = s.url;
+            let displayLookup = s.lookupurl ? s.lookupurl : '';
+            div.innerHTML = `
+                <div>
+                    <div style="font-weight:600;">${s.name} ${tags}</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;">${displayUrl}</div>
+                    ${displayLookup ? `<div style="font-size:0.75rem; color:var(--text-muted); word-break:break-all;">${displayLookup}</div>` : ''}
+                </div>
+                <div class="ms-actions-right">
+                    ${isCustom ? `<button class="icon-btn" style="font-size:1rem;" onclick="editCustomSource('${s.id}')">✏️</button>` : ''}
+                    <div class="ms-fav ${isFav ? 'active' : ''}" onclick="toggleFavSetting('${s.id}')">❤️</div>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    window.toggleFavSetting = (id) => {
+        if(app.favorites.includes(id)) app.favorites = app.favorites.filter(x => x !== id);
+        else app.favorites.push(id);
+        saveFavorites();
+        renderManageSources();
+        if(app.currentTab !== 'overview') renderSources(); 
+    };
+
+    window.editCustomSource = (id) => {
+        const src = app.customSources.find(s => s.id === id);
+        if(!src) return;
+        document.getElementById('add-source-form-container').style.display = 'block';
+        document.getElementById('add-btn-row').style.display = 'none';
+        document.getElementById('delete-custom-source-btn').classList.remove('hidden');
+        document.getElementById('delete-custom-source-btn').onclick = () => removeCustomSource(id);
+        document.getElementById('cs-id').value = src.id;
+        document.getElementById('cs-name').value = src.name;
+        document.getElementById('cs-type').value = src.type;
+        document.getElementById('cs-home').value = src.url;
+        document.getElementById('cs-lookup').value = src.lookupurl;
+        document.getElementById('cs-type').onchange();
+        document.getElementById('cs-id').disabled = true; 
+        document.getElementById('add-source-text').innerText = "Save Changes";
+        document.getElementById('cancel-edit-btn').classList.remove('hidden');
+        app.editingId = id;
+    };
+
+    function saveCustomSource() {
+        const id = document.getElementById('cs-id').value;
+        const name = document.getElementById('cs-name').value;
+        const type = document.getElementById('cs-type').value;
+        let home = document.getElementById('cs-home').value;
+        let lookup = document.getElementById('cs-lookup').value;
+        if(!id || !name || !home) return toast("ID, Name, and Home URL required", "error");
+        if(home && !home.startsWith('http')) home = 'https://' + home;
+        if(lookup && !lookup.startsWith('http')) lookup = 'https://' + lookup;
+        if(!app.editingId && app.customSources.find(c => c.id === id)) return toast("ID already exists", "error");
+        if(app.editingId) {
+            app.customSources = app.customSources.filter(s => s.id !== app.editingId);
+        }
+        const newSrc = { id, name, type, url: home, lookupurl: lookup || '' };
+        app.customSources.push(newSrc);
+        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
+        if(window.sources[type]) {
+            window.sources[type] = window.sources[type].filter(s => s.id !== id);
+            window.sources[type].push(newSrc);
+        }
+        if(!app.favorites.includes(id)) {
+            app.favorites.push(id);
+            saveFavorites();
+        }
+        toast(app.editingId ? "Source updated!" : "Source added!", "success");
+        renderManageSources();
+        closeSourceForm();
+        if(app.currentTab === type) renderSources(); 
+    }
+
+    function removeCustomSource(id) {
+        if(!confirm("Delete this source?")) return;
+        if(app.editingId === id) closeSourceForm();
+        app.customSources = app.customSources.filter(s => s.id !== id);
+        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
+        Object.keys(window.sources).forEach(key => {
+            window.sources[key] = window.sources[key].filter(s => s.id !== id);
+        });
+        renderManageSources();
+        renderSources();
+        toast("Source removed", "warning");
+    }
+
+    function closeSourceForm() {
+        document.getElementById('add-source-form-container').style.display = 'none';
+        document.getElementById('add-btn-row').style.display = 'flex';
+        document.getElementById('cs-id').value = '';
+        document.getElementById('cs-name').value = '';
+        document.getElementById('cs-home').value = '';
+        document.getElementById('cs-lookup').value = '';
+        document.getElementById('cs-id').disabled = false;
+        document.getElementById('add-source-text').innerText = "Save Source";
+        document.getElementById('delete-custom-source-btn').classList.add('hidden');
+        app.editingId = null;
+    }
+
+    window.openBackupUI = () => {
+        document.getElementById('backup-ui').style.display = 'block'; 
+        document.getElementById('backup-toggle-link').style.display = 'none';
+        const backup = { customSources: app.customSources, favorites: app.favorites };
+        document.getElementById('backup-text').value = JSON.stringify(backup, null, 2);
+    };
+
+    window.closeBackupUI = () => {
+        document.getElementById('backup-ui').style.display = 'none'; 
+        document.getElementById('backup-toggle-link').style.display = 'inline';
+    };
+
+    document.getElementById('btn-do-backup-copy').onclick = () => {
+        const txt = document.getElementById('backup-text').value;
+        if(txt) copyToClip(txt, "Backup copied!");
+    };
+
+    document.getElementById('btn-do-restore').onclick = () => {
+        const str = document.getElementById('backup-text').value;
+        if(!str.trim()) return toast("Paste JSON first", "error");
+        try {
+            const backup = JSON.parse(str);
+            if(backup.customSources && Array.isArray(backup.customSources)) {
+                app.customSources = backup.customSources;
+                localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
+            }
+            if(backup.favorites && Array.isArray(backup.favorites)) {
+                app.favorites = backup.favorites;
+                localStorage.setItem('totalosint_favorites', JSON.stringify(app.favorites));
+            }
+            toast("Restore successful!", "success");
+            init(); 
+            softReset(); 
+            renderManageSources();
+            closeBackupUI();
+        } catch(e) {
+            toast("Invalid JSON format", "error");
+        }
+    };
+
+    function toggleReportDropdown() {
+        const type = document.getElementById('preview-sep-type').value;
+        const disabled = (type === 'newline' || type === 'comma');
+        document.getElementById('preview-sep-len').disabled = disabled;
+        document.getElementById('preview-sep-len').style.opacity = disabled ? '0.5' : '1';
+    }
+
     /* --- EVENTS --- */
     function setupEvents() {
         els.input.addEventListener('input', onInputChanged);
         els.input.addEventListener('scroll', syncScroll);
         
+        const resizeObserver = new ResizeObserver(() => {
+            if (window.innerWidth > 900 && els.input.style.height) {
+                 els.input.style.height = '';
+                 els.input.style.width = ''; 
+            }
+        });
+        resizeObserver.observe(document.body);
+
         document.getElementById('branding-btn').onclick = softReset;
         document.getElementById('clear-input-btn').onclick = clearNotes;
         document.getElementById('copy-input-btn').onclick = () => copyToClip(els.input.value, 'Notes copied!');
@@ -1044,36 +1467,77 @@
         document.getElementById('select-all-btn').onclick = () => { app.selectedSources[app.currentTab] = window.sources[app.currentTab].map(s => s.id); renderSources(); updateUI(); };
         document.getElementById('deselect-all-btn').onclick = () => { app.selectedSources[app.currentTab] = []; renderSources(); updateUI(); };
         document.getElementById('sort-sources-btn').onclick = () => { app.sortDesc = !app.sortDesc; renderSources(); };
-        document.getElementById('add-source-header-btn').onclick = () => { document.querySelector('.modal-tab[data-tab="sources"]').click(); els.modals.settings.classList.add('open'); };
+        document.getElementById('manage-sources-btn').onclick = () => { document.querySelector('.modal-tab[data-tab="sources"]').click(); els.modals.settings.classList.add('open'); };
 
         els.tabs.forEach(t => t.onclick = () => switchTab(t.dataset.type));
-        document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')));
-        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', (e) => { if(e.target === m) m.classList.remove('open'); }));
         
-        document.getElementById('settings-btn').onclick = () => els.modals.settings.classList.add('open');
-        document.getElementById('add-custom-source-btn').onclick = addCustomSource;
-        document.getElementById('cancel-edit-btn').onclick = cancelEdit;
+        document.querySelectorAll('.close-modal').forEach(b => b.onclick = function(e) { 
+            e.stopPropagation(); 
+            this.closest('.modal-overlay').classList.remove('open');
+            closeBackupUI();
+        });
+        document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', (e) => { 
+            if(e.target === m) {
+                m.classList.remove('open');
+                closeBackupUI();
+            }
+        }));
+        
+        document.getElementById('settings-btn').onclick = () => { 
+            renderManageSources(); 
+            els.modals.settings.classList.add('open'); 
+        };
+        
+        document.getElementById('show-add-form-btn').onclick = () => { 
+            document.getElementById('add-source-form-container').style.display = 'block'; 
+            document.getElementById('add-btn-row').style.display = 'none';
+        };
+        document.getElementById('save-custom-source-btn').onclick = saveCustomSource;
+        document.getElementById('cancel-edit-btn').onclick = closeSourceForm;
         
         els.launchBtns.modal.onclick = openInvestigation;
         els.launchBtns.direct.onclick = executeInvestigation;
         document.getElementById('execute-btn').onclick = executeInvestigation;
         document.getElementById('generate-report-btn').onclick = generateReport;
+        document.getElementById('preview-report-btn').onclick = previewReport;
+        document.getElementById('preview-copy-btn').onclick = () => copyToClip(app.tempReport);
 
         document.querySelectorAll('.modal-tab').forEach(t => t.onclick = function() {
             document.querySelectorAll('.modal-tab').forEach(x => x.classList.remove('active'));
             document.querySelectorAll('.modal-tab-content').forEach(x => x.classList.remove('active'));
             this.classList.add('active');
             document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
-            if(this.dataset.tab === 'sources') renderCustomSourcesList();
+            if(this.dataset.tab === 'sources') renderManageSources();
+            closeBackupUI();
         });
 
-        document.getElementById('setting-defang').onchange = (e) => { app.settings.defang = e.target.checked; saveSettings(); };
-        document.getElementById('setting-separator').onchange = (e) => { app.settings.separator = e.target.value; saveSettings(); };
-        document.getElementById('setting-reference').onchange = (e) => { app.settings.showReference = e.target.checked; saveSettings(); };
-        document.getElementById('modal-defang').onchange = (e) => { app.settings.defang = e.target.checked; document.getElementById('setting-defang').checked = e.target.checked; saveSettings(); if(els.modals.inv.classList.contains('open')) openInvestigation(); };
+        document.getElementById('setting-defang').onchange = (e) => { 
+            app.settings.defang = e.target.checked; 
+            saveSettings();
+            renderOverview();
+            if(app.currentTab !== 'overview') renderSources();
+        };
+        document.getElementById('modal-defang').onchange = (e) => { 
+            app.settings.defang = e.target.checked; 
+            syncSettingsUI(); saveSettings(); 
+            if(els.modals.inv.classList.contains('open')) openInvestigation(); 
+        };
+        
+        ['defang','reference','sep-type','sep-len','addspace'].forEach(k => {
+             const el = document.getElementById(`preview-${k}`);
+             if(el) {
+                 el.onchange = (e) => {
+                     const keyMap = { 'defang':'defang', 'reference':'showReference', 'sep-type':'sepType', 'sep-len':'sepLen', 'addspace':'addSpace' };
+                     const val = (e.target.type === 'checkbox') ? e.target.checked : e.target.value;
+                     app.settings[keyMap[k]] = val;
+                     syncSettingsUI(); saveSettings();
+                     refreshPreview();
+                 };
+             }
+        });
+
         document.getElementById('cs-id').oninput = function() { this.value = this.value.toUpperCase().replace(/[^A-Z_]/g, ''); };
         
-        // Disable lookup for bookmarks
         const typeSelect = document.getElementById('cs-type');
         const lookupInput = document.getElementById('cs-lookup');
         typeSelect.onchange = () => {
@@ -1084,126 +1548,8 @@
             }
         };
     }
-
-    window.editCustomSource = (id) => {
-        const src = app.customSources.find(s => s.id === id);
-        if(!src) return;
-        
-        // Populate
-        document.getElementById('cs-id').value = src.id;
-        document.getElementById('cs-name').value = src.name;
-        document.getElementById('cs-type').value = src.type;
-        document.getElementById('cs-home').value = src.url;
-        document.getElementById('cs-lookup').value = src.lookupurl;
-        document.getElementById('cs-type').onchange();
-        
-        // UI State
-        document.getElementById('cs-id').disabled = true; // Cannot change ID
-        document.getElementById('add-source-text').innerText = "Save Changes";
-        document.getElementById('add-custom-source-btn').classList.remove('btn-fancy');
-        document.getElementById('add-custom-source-btn').classList.add('btn-success', 'btn-fancy');
-        document.getElementById('cancel-edit-btn').classList.remove('hidden');
-        
-        app.editingId = id;
-    };
-
-    function cancelEdit() {
-        resetSourceForm();
-        app.editingId = null;
-    }
-
-    function addCustomSource() {
-        const id = document.getElementById('cs-id').value;
-        const name = document.getElementById('cs-name').value;
-        const type = document.getElementById('cs-type').value;
-        const home = document.getElementById('cs-home').value;
-        const lookup = document.getElementById('cs-lookup').value;
-
-        if(!id || !name || !home) return toast("ID, Name, and Home URL required", "error");
-        
-        // Check duplicate only if NEW
-        if(!app.editingId && app.customSources.find(c => c.id === id)) return toast("ID already exists", "error");
-        
-        // Remove old if editing
-        if(app.editingId) {
-            app.customSources = app.customSources.filter(s => s.id !== app.editingId);
-        }
-
-        const newSrc = { id, name, type, url: home, lookupurl: lookup || '' };
-        app.customSources.push(newSrc);
-        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
-        
-        // Refresh runtime sources
-        if(window.sources[type]) {
-            // Remove old if exists in runtime (for editing)
-            window.sources[type] = window.sources[type].filter(s => s.id !== id);
-            window.sources[type].push(newSrc);
-        }
-
-        toast(app.editingId ? "Source updated!" : "Source added!", "success");
-        renderCustomSourcesList();
-        resetSourceForm();
-        if(app.currentTab === type) renderSources(); // Refresh UI
-    }
-
-    function resetSourceForm() {
-        document.getElementById('cs-id').value = '';
-        document.getElementById('cs-name').value = '';
-        document.getElementById('cs-home').value = '';
-        document.getElementById('cs-lookup').value = '';
-        document.getElementById('cs-id').disabled = false;
-        document.getElementById('add-source-text').innerText = "Add Source";
-        document.getElementById('add-custom-source-btn').classList.remove('btn-success');
-        document.getElementById('cancel-edit-btn').classList.add('hidden');
-        app.editingId = null;
-    }
-
-    function removeCustomSource(id) {
-        if(app.editingId === id) cancelEdit();
-        app.customSources = app.customSources.filter(s => s.id !== id);
-        localStorage.setItem('totalosint_custom_sources', JSON.stringify(app.customSources));
-        renderCustomSourcesList();
-        // Remove from runtime
-        Object.keys(window.sources).forEach(key => {
-            window.sources[key] = window.sources[key].filter(s => s.id !== id);
-        });
-        renderSources();
-        toast("Source removed", "warning");
-    }
-
-    function renderCustomSourcesList() {
-        const container = document.getElementById('custom-source-list');
-        const header = document.getElementById('custom-source-header');
-        const msg = document.getElementById('no-sources-msg');
-        
-        if(app.customSources.length === 0) { 
-            container.style.display = 'none'; 
-            header.style.display = 'none';
-            msg.style.display = 'block';
-            return; 
-        }
-        
-        container.style.display = 'block';
-        header.style.display = 'block';
-        msg.style.display = 'none';
-        container.innerHTML = '';
-        
-        app.customSources.forEach(s => {
-            const div = document.createElement('div');
-            div.className = 'custom-source-item';
-            div.innerHTML = `
-                <div><div style="font-weight:600; font-size:0.9rem;">${s.name}</div><div style="font-size:0.75rem; color:var(--text-muted);">${s.id} (${s.type})</div></div>
-                <div style="display:flex; gap:5px;">
-                    <button class="icon-btn" onclick="editCustomSource('${s.id}')" style="font-size:1rem;">✏️</button>
-                    <button class="icon-btn" onclick="removeCustomSource('${s.id}')" style="color:var(--danger); font-size:1rem;">🗑️</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
+    
     document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
-
