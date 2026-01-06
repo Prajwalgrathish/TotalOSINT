@@ -278,6 +278,46 @@
         
         .close-modal { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; }
 
+        /* --- MODERN SCROLLBARS (Global) --- */
+        
+        /* Works for Chrome, Edge, Safari */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border); 
+            border-radius: 5px; 
+            border: 2px solid transparent; 
+            background-clip: content-box; 
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-muted); 
+        }
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
+        /* Works for Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        /* --- CLEAN NATIVE RESIZER (Input Panel) --- */
+        
+        .panel-input::-webkit-resizer {
+            background: transparent;
+            border-style: solid;
+            border-width: 6px; 
+            border-color: transparent var(--border) var(--border) transparent; 
+        }
+
+        /* --- MEDIA QUERIES --- */
+
         @media (min-width: 901px) {
             .panel-input { height: auto !important; }
             .add-source-grid { grid-template-columns: 0.5fr 1.5fr 100px; }
@@ -1692,3 +1732,4 @@
 </script>
 </body>
 </html>
+
