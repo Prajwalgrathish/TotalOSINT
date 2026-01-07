@@ -59,7 +59,20 @@
             height: 100vh; height: 100dvh; 
             overflow: hidden; 
         }
-        
+
+        /* --- 1. MODERN SCROLLBARS --- */
+        /* Standard/Firefox */
+        * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+        /* Webkit (Wrapped to prevent Firefox warnings) */
+        @media screen and (-webkit-min-device-pixel-ratio:0) {
+            ::-webkit-scrollbar { width: 10px; height: 10px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 5px; border: 2px solid transparent; background-clip: content-box; }
+            ::-webkit-scrollbar-thumb:hover { background-color: var(--text-muted); }
+            ::-webkit-scrollbar-corner { background: transparent; }
+        }
+
         /* --- Components --- */
         header { background: var(--bg-header); color: var(--text-light); padding: 0 15px; height: 50px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; border-bottom: 1px solid #1e293b; z-index: 10; }
         .branding { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
@@ -104,12 +117,35 @@
         /* --- Panels --- */
         main { flex: 1; display: flex; overflow: hidden; position: relative; }
         
+        /* 2. CUSTOM RESIZE GRIP (Solid Triangle) */
         .panel-input { 
             width: 300px; min-width: 180px; max-width: 60%;
             background: var(--bg-panel); border-right: 1px solid var(--border); 
             display: flex; flex-direction: column; z-index: 5; flex-shrink: 0;
-            resize: horizontal; overflow: hidden; 
+            
+            /* Chrome/Edge: overflow:scroll forces the resizer area to exist */
+            resize: horizontal; overflow: scroll; 
+            
+            /* Firefox: Visual Grip (Solid Triangle) */
+            scrollbar-width: none; 
+            background-image: linear-gradient(135deg, transparent 50%, var(--border) 50%);
+            background-size: 12px 12px;
+            background-repeat: no-repeat;
+            background-position: bottom 2px right 2px;
         }
+
+        /* Chrome/Edge: Hide scrollbars but keep resizer area */
+        .panel-input::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        .panel-input::-webkit-scrollbar-corner { background: transparent; }
+        
+        /* Chrome/Edge: Solid Triangle Grip */
+        .panel-input::-webkit-resizer {
+            background: transparent;
+            border-style: solid;
+            border-width: 6px; 
+            border-color: transparent var(--border) var(--border) transparent;
+        }
+
         .panel-header { padding: 8px 15px; border-bottom: 1px solid var(--border); font-weight: 600; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); }
         .header-actions { display: flex; gap: 5px; }
 
@@ -193,8 +229,10 @@
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px); }
         .modal-overlay.open { display: flex; }
         .modal { background: var(--bg-panel); width: 90%; max-width: 650px; height: 526px; max-height: 90vh; border-radius: var(--radius); display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.4); overflow: hidden; border: 1px solid var(--border); }
-        .modal-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; background: var(--bg-panel); color: var(--text-main); }
+        
+        .modal-header { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--bg-panel); color: var(--text-main); }
         .modal-header h2 { margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        
         .modal-body { padding: 0; overflow-y: auto; flex: 1; display: flex; flex-direction: column; }
         
         .modal-tabs { display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; background: var(--bg-body); overflow-x: auto; flex-shrink: 0; }
@@ -277,46 +315,6 @@
         .backup-textarea { width: 100%; height: 80px; background: var(--bg-panel); color: var(--accent); border: 1px solid var(--border); font-family: monospace; padding: 8px; margin-bottom: 10px; font-size: 0.75rem; resize: vertical; }
         
         .close-modal { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px; cursor: pointer; }
-
-        /* --- MODERN SCROLLBARS (Global) --- */
-        
-        /* Works for Chrome, Edge, Safari */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: var(--border); 
-            border-radius: 5px; 
-            border: 2px solid transparent; 
-            background-clip: content-box; 
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background-color: var(--text-muted); 
-        }
-        ::-webkit-scrollbar-corner {
-            background: transparent;
-        }
-        /* Works for Firefox */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--border) transparent;
-        }
-
-        /* --- CLEAN NATIVE RESIZER (Input Panel) --- */
-        
-        .panel-input::-webkit-resizer {
-            background: transparent;
-            border-style: solid;
-            border-width: 6px; 
-            border-color: transparent var(--border) var(--border) transparent; 
-        }
-
-        /* --- MEDIA QUERIES --- */
 
         @media (min-width: 901px) {
             .panel-input { height: auto !important; }
@@ -514,36 +512,43 @@
 <!-- Report Modal -->
 <div class="modal-overlay" id="preview-modal" style="z-index: 1100;">
     <div class="modal" style="max-width: 650px; height: 600px; position: relative;">
+        <!-- Header -->
         <div class="modal-header">
-            <h2 id="preview-title" style="margin:0; font-size:1.1rem;">Report</h2>
-            
-            <select class="form-select form-select-auto" id="preview-mode" style="padding:2px 6px; font-size:0.8rem; height: 26px; font-weight:600;">
-                <option value="full">Full Report</option>
-                <option value="simple">Simple List</option>
-            </select>
-            
-            <button class="icon-btn close-modal" style="color:var(--text-main); justify-self: end;">×</button>
+            <h2 id="preview-title">Report</h2>
+            <button class="icon-btn close-modal" style="color:var(--text-main);">×</button>
         </div>
         
         <div class="report-controls-bar">
+             <!-- Group 1: Mode -->
+             <div class="report-control-item">
+                <select class="form-select form-select-auto" id="preview-mode" style="padding:2px 6px; font-size:0.8rem; height: 26px; font-weight:600;">
+                    <option value="full">Full Report</option>
+                    <option value="simple">Simple List</option>
+                </select>
+             </div>
+
+             <!-- Group 2: Common -->
              <div class="report-control-item">
                 <span class="report-control-label">Defang</span>
                 <label class="toggle-switch"> <input type="checkbox" id="preview-defang"> <span class="toggle-slider"></span> </label>
              </div>
+             <div class="report-control-item">
+                <span class="report-control-label">Refs</span>
+                <label class="toggle-switch"> <input type="checkbox" id="preview-reference"> <span class="toggle-slider"></span> </label>
+             </div>
 
+             <!-- Group 3: Full Mode Options -->
              <div id="controls-full" style="display:contents;">
-                 <div class="report-control-item">
-                    <span class="report-control-label">Refs</span>
-                    <label class="toggle-switch"> <input type="checkbox" id="preview-reference"> <span class="toggle-slider"></span> </label>
-                 </div>
                  <div class="report-control-item">
                     <span class="report-control-label">Verdict</span>
                     <label class="toggle-switch"> <input type="checkbox" id="preview-verdict"> <span class="toggle-slider"></span> </label>
                  </div>
-                 <div class="report-control-item" style="margin-left:auto;">
+                 <div class="report-control-item">
                     <span class="report-control-label">Space</span>
                     <label class="toggle-switch"> <input type="checkbox" id="preview-addspace"> <span class="toggle-slider"></span> </label>
-                    <select class="form-select form-select-auto" id="preview-sep-type" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
+                 </div>
+                 <div class="report-control-item">
+                     <select class="form-select form-select-auto" id="preview-sep-type" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
                         <option value="newline">Newline</option>
                         <option value="dash">Hyphen (-)</option>
                         <option value="eq">Equal (=)</option>
@@ -561,7 +566,9 @@
                  </div>
              </div>
 
-             <div id="controls-simple" style="display:none; flex:1; justify-content:flex-end; gap:15px; align-items:center;">
+             <!-- Group 4: Formatting -->
+             <div style="flex:1; display:flex; justify-content:flex-end; gap:15px; align-items:center;">
+                <!-- Quotes applies to both modes (but only entities) -->
                 <div class="report-control-item">
                     <span class="report-control-label">Quotes</span>
                     <select class="form-select form-select-auto" id="preview-quotes" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
@@ -570,7 +577,8 @@
                         <option value="double">Double (")</option>
                     </select>
                 </div>
-                <div class="report-control-item">
+                <!-- List only applies to simple mode -->
+                <div class="report-control-item" id="controls-simple-list">
                     <span class="report-control-label">List</span>
                     <select class="form-select form-select-auto" id="preview-list" style="padding:2px 6px; font-size:0.8rem; height: 26px;">
                         <option value="bullet-dash">Bullet (-)</option>
@@ -756,7 +764,6 @@
             showReference: true, showVerdict: true, 
             reportMode: 'full', quoteType: 'none', listType: 'bullet-dash' 
         },
-        debounceTimer: null,
         editingId: null,
         tempReport: ''
     };
@@ -823,13 +830,11 @@
         document.getElementById('preview-quotes').value = app.settings.quoteType;
         document.getElementById('preview-list').value = app.settings.listType;
 
-        const entities = (app.data[app.currentTab] || []).filter(e => !app.disabledEntities[e.val]);
-        const forceSimple = (entities.length === 0);
-        
-        const isSimple = app.settings.reportMode === 'simple' || forceSimple;
+        const isSimple = app.settings.reportMode === 'simple';
         document.getElementById('controls-full').style.display = isSimple ? 'none' : 'contents';
-        document.getElementById('controls-simple').style.display = isSimple ? 'flex' : 'none';
-
+        // Only show List dropdown in Simple Mode (applies to Entity List)
+        document.getElementById('controls-simple-list').style.display = isSimple ? 'flex' : 'none';
+        
         toggleReportDropdown();
     }
 
@@ -879,9 +884,9 @@
     };
 
     function onInputChanged() {
-        clearTimeout(app.debounceTimer);
+        // Instant analysis on paste/type (delay removed per request)
         generateHighlights(); 
-        app.debounceTimer = setTimeout(analyzeInput, 600);
+        analyzeInput();
     }
 
     function cleanInput(val) {
@@ -935,7 +940,13 @@
              app.data.domain.push({ val: cleanD, type: 'Domain' });
         });
 
-        [...new Set(rawIPv6s)].forEach(ip => app.data.ip.push({ val: cleanInput(ip), type: 'IPv6' }));
+        [...new Set(rawIPv6s)].forEach(ip => {
+            const clean = cleanInput(ip);
+            // Strict check: Must have at least one Hex digit to be valid (ignores "::" etc)
+            if(!/[0-9a-fA-F]/.test(clean)) return;
+            app.data.ip.push({ val: clean, type: 'IPv6' });
+        });
+        
         [...new Set(rawIPv4s)].forEach(ip => app.data.ip.push({ val: cleanInput(ip), type: 'IPv4' }));
         
         [...new Set(rawHashes)].forEach(h => {
@@ -1003,8 +1014,12 @@
              return;
         }
 
-        dash.style.display = 'grid';
-        els.msg.classList.add('hidden');
+        // Bug Fix: Only force grid display if currently on overview tab
+        if(app.currentTab === 'overview') {
+            dash.style.display = 'grid';
+            els.msg.classList.add('hidden');
+        }
+
         dash.innerHTML = '';
 
         ['ip','domain','hash'].forEach(key => {
@@ -1059,6 +1074,9 @@
         text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         
         const wrap = (t, rx, cls) => t.replace(rx, m => {
+            // Fix: Check for IPv6 validity (must contain hex) before highlighting
+            if(cls === 'type-ip' && m.includes(':') && !/[0-9a-fA-F]/.test(m)) return m;
+            
             let clean = cleanInput(m);
             if(app.disabledEntities[clean]) return m; 
             return `<mark class="${cls}">${m}</mark>`;
@@ -1275,81 +1293,106 @@
         const sourceIds = app.selectedSources[app.currentTab];
         const activeSources = window.sources[app.currentTab].filter(s => sourceIds.includes(s.id));
         
-        // No Entities Fallback
-        if (entities.length === 0) {
-            if (activeSources.length === 0) return "No entities or sources selected.";
-            
-            const list = activeSources.map(s => s.url);
-            let report = "Target Sources:\n";
-            const qMap = { 'none': '', 'single': "'", 'double': '"' };
-            const q = qMap[app.settings.quoteType] || '';
-            const listType = app.settings.listType;
+        // Formatting options
+        const qMap = { 'none': '', 'single': "'", 'double': '"' };
+        const q = qMap[app.settings.quoteType] || '';
+        const listType = app.settings.listType;
 
-            if (listType === 'comma') {
-                if(forHtml) {
-                    report += list.map(val => `${q}###LINK###${val}###LINK###${q}`).join(', ');
-                } else {
-                    report += list.map(val => `${q}${val}${q}`).join(', ');
-                }
-            } else {
-                list.forEach(val => {
-                    let prefix = "";
-                    if(listType === 'bullet-dash') prefix = "- ";
-                    if(listType === 'bullet-star') prefix = "* ";
-                    
-                    if(forHtml) report += `${prefix}${q}###LINK###${val}###LINK###${q}\n`;
-                    else report += `${prefix}${q}${val}${q}\n`;
+        // Helper for Entity Lists (Simple Mode)
+        const formatEntityList = (items) => {
+             if (items.length === 1) {
+                 return `${q}${items[0]}${q}`;
+             }
+             if(listType === 'comma') {
+                return items.map(val => `${q}${val}${q}`).join(', ');
+             } else {
+                let prefix = "";
+                if(listType === 'bullet-dash') prefix = "- ";
+                if(listType === 'bullet-star') prefix = "* ";
+                return items.map(val => `${prefix}${q}${val}${q}`).join('\n');
+             }
+        };
+
+        // Helper for Reference Lists (Always Bullet - or Single Line)
+        const formatRefList = (items, isHtml) => {
+            if (items.length === 1) {
+                const val = items[0];
+                if(isHtml) return `###LINK###${val}###LINK###`;
+                return val;
+            }
+            return items.map(val => {
+                if(isHtml) return `- ###LINK###${val}###LINK###`;
+                return `- ${val}`;
+            }).join('\n');
+        };
+
+        // --- SIMPLE MODE ---
+        if (app.settings.reportMode === 'simple') {
+            let report = "";
+            
+            // 1. List Entities (if any)
+            if (entities.length > 0) {
+                const groups = {};
+                entities.forEach(obj => {
+                    if(!groups[obj.type]) groups[obj.type] = [];
+                    groups[obj.type].push(applyDefang(obj.val));
                 });
+
+                Object.keys(groups).sort().forEach(type => {
+                    const items = groups[type];
+                    if (items.length === 1) {
+                         report += `${type}s: ${formatEntityList(items)}\n\n`;
+                    } else {
+                         report += `${type}s:\n`;
+                         report += formatEntityList(items);
+                         report += "\n\n";
+                    }
+                });
+            }
+
+            // 2. List References
+            if (app.settings.showReference && activeSources.length > 0) {
+                let refUrls = [];
+                if (entities.length > 0) {
+                    entities.forEach(obj => {
+                        const ent = obj.val;
+                        activeSources.forEach(src => {
+                            let url = src.url;
+                            if (src.lookupurl && src.lookupurl.trim() !== '') {
+                                url = src.lookupurl + encodeURIComponent(ent);
+                            }
+                            refUrls.push(url);
+                        });
+                    });
+                } else {
+                    activeSources.forEach(src => refUrls.push(src.url));
+                }
+                refUrls = [...new Set(refUrls)];
+                
+                if (refUrls.length === 1) {
+                     report += "References: " + formatRefList(refUrls, forHtml);
+                } else {
+                     report += "References:\n" + formatRefList(refUrls, forHtml);
+                }
             }
             return report.trim();
         }
 
-        // Simple Mode
-        if (app.settings.reportMode === 'simple') {
-            const groups = {};
-            entities.forEach(obj => {
-                if(!groups[obj.type]) groups[obj.type] = [];
-                groups[obj.type].push(obj.val);
-            });
-
-            let report = "";
-            const qMap = { 'none': '', 'single': "'", 'double': '"' };
-            const q = qMap[app.settings.quoteType] || '';
-            
-            Object.keys(groups).sort().forEach(type => {
-                report += `${type}s:\n`;
-                const list = groups[type];
-                const listType = app.settings.listType;
-                
-                if (listType === 'comma') {
-                    const line = list.map(val => `${q}${applyDefang(val)}${q}`).join(', ');
-                    report += line + "\n\n";
-                } else {
-                    list.forEach(val => {
-                        const cleanVal = applyDefang(val);
-                        let prefix = "";
-                        if(listType === 'bullet-dash') prefix = "- ";
-                        if(listType === 'bullet-star') prefix = "* ";
-                        report += `${prefix}${q}${cleanVal}${q}\n`;
-                    });
-                    report += "\n";
-                }
-            });
-            return report.trim();
-        }
-
-        // Full Mode
+        // --- FULL MODE ---
         let report = "";
         const sep = getSeparator();
         const showRefs = app.settings.showReference && activeSources.length > 0;
         const showVerdict = app.settings.showVerdict; 
+
+        if (entities.length === 0) return "No entities.";
 
         entities.forEach((obj, i) => {
             const ent = obj.val;
             const v = app.verdicts[ent] || { status: 'Untriaged', note: '' };
             const displayEnt = applyDefang(ent);
             
-            report += `${obj.type}: ${displayEnt}\n`;
+            // Apply Quote setting to Entity Name in Full Mode
+            report += `${obj.type}: ${q}${displayEnt}${q}\n`;
             
             if(showVerdict) {
                 report += `Verdict: ${v.status}\n`;
@@ -1357,24 +1400,19 @@
             if(v.note) report += `Note: ${v.note}\n`;
             
             if(showRefs) {
-                if(activeSources.length === 1) {
-                    let src = activeSources[0];
+                let currentRefs = [];
+                activeSources.forEach(src => {
                     let url = src.url;
                     if(ent && ent.trim() !== '' && src.lookupurl && src.lookupurl.trim() !== '') {
                         url = src.lookupurl + encodeURIComponent(ent);
                     }
-                    if(forHtml) report += `References: ###LINK###${url}###LINK###`;
-                    else report += `References: ${url}`;
+                    currentRefs.push(url);
+                });
+                
+                if (currentRefs.length === 1) {
+                     report += "References: " + formatRefList(currentRefs, forHtml);
                 } else {
-                    report += `References:`;
-                    activeSources.forEach(src => {
-                        let url = src.url;
-                        if(ent && ent.trim() !== '' && src.lookupurl && src.lookupurl.trim() !== '') {
-                            url = src.lookupurl + encodeURIComponent(ent);
-                        }
-                        if(forHtml) report += `\n###LINK###${url}###LINK###`;
-                        else report += `\n${url}`;
-                    });
+                     report += "References:\n" + formatRefList(currentRefs, forHtml);
                 }
             } else {
                 report = report.trimEnd();
@@ -1387,7 +1425,7 @@
 
     function generateReport() {
         const report = buildReportText(false);
-        if(!report) return toast("No entities to report.", "warning");
+        if(!report) return toast("Report empty.", "warning");
         copyToClip(report);
     }
     
@@ -1398,12 +1436,15 @@
         if(entities.length === 0 && sourceIds.length === 0) return toast("No entities or sources to report.", "warning");
         
         const modeSelect = document.getElementById('preview-mode');
+        // Always enable simple mode, even if no entities
+        modeSelect.disabled = false;
         if(entities.length === 0) {
-            modeSelect.value = 'simple'; 
-            modeSelect.disabled = true;
-            modeSelect.title = "Full report requires entities";
+             // Force simple mode if no entities (Full mode makes no sense without entities)
+             modeSelect.value = 'simple';
+             app.settings.reportMode = 'simple';
+             modeSelect.disabled = true; // Lock it to simple
+             modeSelect.title = "Full report requires entities";
         } else {
-            modeSelect.disabled = false;
             modeSelect.title = "";
         }
         
@@ -1415,7 +1456,7 @@
     function refreshPreview() {
         const report = buildReportText(true);
         if(!report) {
-            document.getElementById('report-content').innerHTML = "No entities to report.";
+            document.getElementById('report-content').innerHTML = "No content generated.";
             return;
         }
         const escaped = report.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -1635,14 +1676,6 @@
         els.input.addEventListener('input', onInputChanged);
         els.input.addEventListener('scroll', syncScroll);
         
-        const resizeObserver = new ResizeObserver(() => {
-            if (window.innerWidth > 900 && els.input.style.height) {
-                 els.input.style.height = '';
-                 els.input.style.width = ''; 
-            }
-        });
-        resizeObserver.observe(document.body);
-
         document.getElementById('branding-btn').onclick = softReset;
         document.getElementById('clear-input-btn').onclick = softReset;
         document.getElementById('copy-input-btn').onclick = () => copyToClip(els.input.value, 'Notes copied!');
@@ -1732,4 +1765,3 @@
 </script>
 </body>
 </html>
-
